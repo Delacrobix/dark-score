@@ -1,16 +1,23 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { exportAsPdf, exportAsPng } from '../lib/exporter'
 import type { ExportFormat } from '../lib/exporter'
 
+const DPI_OPTIONS = [200, 300] as const
+
 export function ExportButton() {
-  const { pages, sourceType, sourceFile } = useAppStore()
-  const [format, setFormat] = useState<ExportFormat>(sourceType === 'image' ? 'png' : 'pdf')
+  const { t } = useTranslation()
+  const { pages, sources, exportDpi, setExportDpi } = useAppStore()
+  const hasPdf = sources.some((s) => s.type === 'pdf')
+  const [format, setFormat] = useState<ExportFormat>(hasPdf ? 'pdf' : 'png')
   const [exporting, setExporting] = useState(false)
 
   const hasResult = pages.some((p) => p?.processedCanvas)
-
-  const baseName = sourceFile?.name.replace(/\.[^.]+$/, '') ?? 'dark-score'
+  const multiPage = pages.filter((p) => p?.processedCanvas).length > 1
+  const baseName = sources.length === 1
+    ? (sources[0].file.name.replace(/\.[^.]+$/, '') ?? 'dark-score')
+    : 'dark-score-batch'
 
   const handleExport = async () => {
     if (!hasResult || exporting) return
@@ -36,16 +43,34 @@ export function ExportButton() {
             onClick={() => setFormat(f)}
             disabled={!hasResult}
             className={`flex-1 py-1.5 font-medium uppercase tracking-wide transition-colors cursor-pointer disabled:cursor-not-allowed
-              ${format === f
-                ? 'bg-zinc-700 text-white'
-                : 'text-zinc-500 hover:text-zinc-300'
-              }`}
+              ${format === f ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
           >
-            {f}
-            {f === 'png' && pages.filter((p) => p?.processedCanvas).length > 1 && ' (ZIP)'}
+            {f}{f === 'png' && multiPage ? t('export.zipSuffix') : ''}
           </button>
         ))}
       </div>
+
+      {/* DPI selector (only for PDFs) */}
+      {hasPdf && (
+        <div className="flex items-center justify-between text-xs text-zinc-500">
+          <span>DPI</span>
+          <div className="flex gap-1">
+            {DPI_OPTIONS.map((dpi) => (
+              <button
+                key={dpi}
+                onClick={() => setExportDpi(dpi)}
+                className={`px-2 py-0.5 rounded transition-colors cursor-pointer
+                  ${exportDpi === dpi
+                    ? 'bg-zinc-700 text-white'
+                    : 'text-zinc-600 hover:text-zinc-300'
+                  }`}
+              >
+                {dpi}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <button
         onClick={() => { void handleExport() }}
@@ -56,7 +81,7 @@ export function ExportButton() {
             : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
           }`}
       >
-        {exporting ? 'Exportando…' : 'Descargar'}
+        {exporting ? t('export.exporting') : t('export.button')}
       </button>
     </div>
   )
