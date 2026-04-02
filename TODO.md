@@ -2,11 +2,7 @@
 
 ## Pending
 
-- [ ] Fix: canvas not visible on initial document load (requires interaction to appear)
-- [x] Add real donation link in `src/components/DonateButton.tsx` (Ko-fi)
-- [ ] Add real GA Measurement ID in `src/lib/analytics.ts` (replace `GA_MEASUREMENT_ID` placeholder)
 - [ ] Add testing
-- [ ] Improve SEO
 - [ ] Reddit publication
 
 ## Completed
@@ -22,3 +18,8 @@
 - [x] Draggable split view for original vs. result comparison
 - [x] Installable PWA (manifest + service worker)
 - [x] Batch processing (upload multiple scores at once)
+- [x] Add real donation link (Ko-fi)
+- [x] Add real GA Measurement ID
+- [x] Fix: canvas not visible on initial document load
+- [x] Improve SEO (meta tags, Open Graph, structured data, darkscore.app domain)
+- [x] Create og-image.png for social media previews
