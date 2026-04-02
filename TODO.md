@@ -1,18 +1,22 @@
 # TODO
 
-## Pending features
+## Pending
 
-- [ ] Replace undo/redo buttons with a settings change history panel (better UX for this type of app — shows last N states with timestamp and active preset, click to restore)
-- [ ] Install and configure `i18next` + `react-i18next` + `i18next-browser-languagedetector`
-- [ ] Create EN/ES translation files for all UI text
-- [ ] Auto-detect language from browser/region settings
-- [ ] Add language selector to the UI (header), defaulting to English
-- [ ] Implement a donate button linking to PayPal or similar (optional, but could help support development costs)
+- [ ] Fix: canvas not visible on initial document load (requires interaction to appear)
+- [ ] Add real donation link in `src/components/DonateButton.tsx` (replace `DONATE_URL` placeholder)
+- [ ] Add real GA Measurement ID in `src/lib/analytics.ts` (replace `GA_MEASUREMENT_ID` placeholder)
+- [ ] Add testing
 
-## Phase 2 (post-MVP)
+## Completed
 
-- [ ] Draggable split view for original vs. result comparison
-- [ ] Batch processing (upload multiple scores at once)
-- [ ] Installable PWA for offline use
-- [ ] Export DPI selector (200 / 300 DPI)
-- [ ] Zoom in preview
+- [x] Replace undo/redo with settings history panel
+- [x] i18n (EN/ES) with auto language detection and selector
+- [x] Donate button
+- [x] Sentry for error tracking
+- [x] Google Analytics (placeholder)
+- [x] Add more presets (Classical, Jazz, Pop/Rock, Blue light filter)
+- [x] Zoom controls in preview (Ctrl+scroll, +/- buttons)
+- [x] Export DPI selector (200 / 300 DPI)
+- [x] Draggable split view for original vs. result comparison
+- [x] Installable PWA (manifest + service worker)
+- [x] Batch processing (upload multiple scores at once)
