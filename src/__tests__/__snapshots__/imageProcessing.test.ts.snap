@@ -1,0 +1,201 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`preset regression > bluelight preset snapshot 1`] = `
+[
+  212,
+  178,
+  110,
+  255,
+  212,
+  178,
+  110,
+  255,
+  27,
+  21,
+  6,
+  255,
+  27,
+  21,
+  6,
+  255,
+  27,
+  21,
+  6,
+  255,
+]
+`;
+
+exports[`preset regression > classical preset snapshot 1`] = `
+[
+  250,
+  250,
+  250,
+  255,
+  250,
+  250,
+  250,
+  255,
+  250,
+  250,
+  250,
+  255,
+  0,
+  0,
+  0,
+  255,
+  0,
+  0,
+  0,
+  255,
+]
+`;
+
+exports[`preset regression > custom preset snapshot 1`] = `
+[
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  0,
+  0,
+  0,
+  255,
+  0,
+  0,
+  0,
+  255,
+]
+`;
+
+exports[`preset regression > jazz preset snapshot 1`] = `
+[
+  218,
+  210,
+  195,
+  255,
+  218,
+  210,
+  195,
+  255,
+  218,
+  210,
+  195,
+  255,
+  13,
+  13,
+  13,
+  255,
+  13,
+  13,
+  13,
+  255,
+]
+`;
+
+exports[`preset regression > pit preset snapshot 1`] = `
+[
+  221,
+  207,
+  180,
+  255,
+  221,
+  207,
+  180,
+  255,
+  221,
+  207,
+  180,
+  255,
+  25,
+  18,
+  14,
+  255,
+  25,
+  18,
+  14,
+  255,
+]
+`;
+
+exports[`preset regression > pop preset snapshot 1`] = `
+[
+  221,
+  227,
+  240,
+  255,
+  221,
+  227,
+  240,
+  255,
+  221,
+  227,
+  240,
+  255,
+  221,
+  227,
+  240,
+  255,
+  17,
+  19,
+  24,
+  255,
+]
+`;
+
+exports[`preset regression > stage preset snapshot 1`] = `
+[
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  255,
+  0,
+  0,
+  0,
+  255,
+  0,
+  0,
+  0,
+  255,
+]
+`;
+
+exports[`preset regression > study preset snapshot 1`] = `
+[
+  213,
+  213,
+  213,
+  255,
+  213,
+  213,
+  213,
+  255,
+  213,
+  213,
+  213,
+  255,
+  25,
+  25,
+  25,
+  255,
+  25,
+  25,
+  25,
+  255,
+]
+`;
