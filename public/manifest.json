@@ -1,0 +1,16 @@
+{
+  "name": "Dark Score",
+  "short_name": "Dark Score",
+  "description": "Convert your sheet music to dark mode. 100% in-browser.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
