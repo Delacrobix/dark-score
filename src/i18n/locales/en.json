@@ -11,6 +11,7 @@
   },
   "header": {
     "local": "Local processing",
+    "localTooltip": "Your files are processed entirely in your browser. Nothing is uploaded to any server.",
     "newScore": "← New score"
   },
   "steps": {

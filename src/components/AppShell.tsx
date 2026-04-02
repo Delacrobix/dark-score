@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useCallback, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { useProcessor } from '../lib/useProcessor'
@@ -49,18 +49,26 @@ export function AppShell({ onGoHome }: Readonly<{ onGoHome: () => void }>) {
         <div className="ml-auto flex items-center gap-4">
           <DonateButton />
           <LanguageSelector />
-          <span className="text-xs text-zinc-700 flex items-center gap-1.5">
+          <span className="text-xs text-zinc-700 flex items-center gap-1.5 relative group">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
             {t('header.local')}
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-600 cursor-help" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <span className="absolute top-full right-0 mt-2 w-56 px-3 py-2 bg-zinc-800 text-zinc-300 text-xs rounded-lg shadow-lg opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity z-50">
+              {t('header.localTooltip')}
+            </span>
           </span>
         </div>
       </header>
 
       {/* Main */}
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_300px] overflow-hidden">
-        <div className="flex flex-col items-center justify-center p-8 border-r border-zinc-800 gap-4 overflow-auto">
+      <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <div className="flex-1 flex flex-col items-center justify-center p-8 border-r border-zinc-800 gap-4 overflow-auto min-w-0">
           {hasFile ? (
             <>
               {hasResult && (
@@ -85,13 +93,59 @@ export function AppShell({ onGoHome }: Readonly<{ onGoHome: () => void }>) {
           )}
         </div>
 
-        <div className="p-6 border-t border-zinc-800 lg:border-t-0 flex flex-col gap-6">
+        <ResizablePanel>
           <ControlsPanel />
           <div className="mt-auto">
             <ExportButton />
           </div>
-        </div>
+        </ResizablePanel>
       </main>
+    </div>
+  )
+}
+
+const MIN_PANEL_WIDTH = 300
+const MAX_PANEL_RATIO = 0.4
+
+function ResizablePanel({ children }: Readonly<{ children: ReactNode }>) {
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [width, setWidth] = useState(MIN_PANEL_WIDTH)
+
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    const startX = e.clientX
+    const startWidth = width
+
+    const onMouseMove = (ev: MouseEvent) => {
+      const delta = startX - ev.clientX
+      const maxWidth = window.innerWidth * MAX_PANEL_RATIO
+      setWidth(Math.max(MIN_PANEL_WIDTH, Math.min(startWidth + delta, maxWidth)))
+    }
+
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+    }
+
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+  }, [width])
+
+  return (
+    <div
+      ref={panelRef}
+      className="relative flex flex-col gap-6 p-6 border-t border-zinc-800 lg:border-t-0 shrink-0"
+      style={{ width }}
+    >
+      <button
+        type="button"
+        aria-label="Resize panel"
+        onMouseDown={onMouseDown}
+        className="hidden lg:flex absolute left-0 top-0 bottom-0 w-3 -ml-1.5 cursor-col-resize items-center justify-center border-0 bg-transparent p-0 group/handle"
+      >
+        <span className="w-0.5 h-8 rounded-full bg-zinc-700 group-hover/handle:bg-purple-400 group-active/handle:bg-purple-500 transition-colors" />
+      </button>
+      {children}
     </div>
   )
 }

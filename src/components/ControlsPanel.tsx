@@ -27,8 +27,8 @@ export function ControlsPanel() {
                     : 'border-zinc-800 hover:border-zinc-600 text-zinc-300'
                   }`}
               >
-                <span className="block font-medium mb-0.5">{t(`presets.${preset.id}.name`)}</span>
-                <span className="text-zinc-600">{t(`presets.${preset.id}.description`)}</span>
+                <span className="block font-medium mb-0.5 break-words">{t(`presets.${preset.id}.name`)}</span>
+                <span className="text-zinc-600 block break-words">{t(`presets.${preset.id}.description`)}</span>
               </button>
             )
           })}

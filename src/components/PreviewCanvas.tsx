@@ -2,19 +2,25 @@ import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 
-const ZOOM_STEPS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 3]
-const DEFAULT_ZOOM_INDEX = 3 // 100%
+const ZOOM_STEP = 25
+const DEFAULT_ZOOM = 100
+const MIN_ZOOM = 1
+const MAX_ZOOM = 500
 
 export function PreviewCanvas() {
   const { t } = useTranslation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const { pages, currentPage, isLoading, loadingProgress } = useAppStore()
-  const [zoomIndex, setZoomIndex] = useState(DEFAULT_ZOOM_INDEX)
+  const [zoomPercent, setZoomPercent] = useState(DEFAULT_ZOOM)
+  const [isEditing, setIsEditing] = useState(false)
 
-  const zoom = ZOOM_STEPS[zoomIndex]
+  const zoom = zoomPercent / 100
   const page = pages[currentPage]
   const processedCanvas = page?.processedCanvas ?? null
+
+  const clampZoom = (v: number) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, v))
 
   // Draw processed canvas — useLayoutEffect ensures it paints before browser renders
   useLayoutEffect(() => {
@@ -27,20 +33,34 @@ export function PreviewCanvas() {
   }, [processedCanvas])
 
   useEffect(() => {
-    setZoomIndex(DEFAULT_ZOOM_INDEX)
+    setZoomPercent(DEFAULT_ZOOM)
   }, [currentPage])
 
   const zoomIn = useCallback(() => {
-    setZoomIndex((i) => Math.min(i + 1, ZOOM_STEPS.length - 1))
+    setZoomPercent((z) => clampZoom(z + ZOOM_STEP))
   }, [])
 
   const zoomOut = useCallback(() => {
-    setZoomIndex((i) => Math.max(i - 1, 0))
+    setZoomPercent((z) => clampZoom(z - ZOOM_STEP))
   }, [])
 
-  const resetZoom = useCallback(() => {
-    setZoomIndex(DEFAULT_ZOOM_INDEX)
-  }, [])
+  const handleEditStart = () => {
+    setIsEditing(true)
+    setTimeout(() => inputRef.current?.select(), 0)
+  }
+
+  const handleEditConfirm = () => {
+    setIsEditing(false)
+    const val = parseInt(inputRef.current?.value ?? '', 10)
+    if (!isNaN(val) && val >= MIN_ZOOM) {
+      setZoomPercent(clampZoom(val))
+    }
+  }
+
+  const handleEditKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleEditConfirm()
+    if (e.key === 'Escape') setIsEditing(false)
+  }
 
   // Ctrl+scroll to zoom
   useEffect(() => {
@@ -80,20 +100,33 @@ export function PreviewCanvas() {
       <div className="flex items-center justify-center gap-2">
         <button
           onClick={zoomOut}
-          disabled={zoomIndex === 0}
+          disabled={zoomPercent <= MIN_ZOOM}
           className="w-7 h-7 flex items-center justify-center rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm"
         >
           −
         </button>
-        <button
-          onClick={resetZoom}
-          className="text-xs text-zinc-500 hover:text-white transition-colors cursor-pointer tabular-nums min-w-[3rem] text-center"
-        >
-          {Math.round(zoom * 100)}%
-        </button>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="number"
+            min={MIN_ZOOM}
+            max={MAX_ZOOM}
+            defaultValue={zoomPercent}
+            onBlur={handleEditConfirm}
+            onKeyDown={handleEditKeyDown}
+            className="w-14 text-xs text-center text-white bg-zinc-800 border border-zinc-600 rounded px-1 py-0.5 tabular-nums outline-none focus:border-purple-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          />
+        ) : (
+          <button
+            onClick={handleEditStart}
+            className="text-xs text-zinc-500 hover:text-white transition-colors cursor-pointer tabular-nums min-w-[3rem] text-center"
+          >
+            {zoomPercent}%
+          </button>
+        )}
         <button
           onClick={zoomIn}
-          disabled={zoomIndex === ZOOM_STEPS.length - 1}
+          disabled={zoomPercent >= MAX_ZOOM}
           className="w-7 h-7 flex items-center justify-center rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm"
         >
           +

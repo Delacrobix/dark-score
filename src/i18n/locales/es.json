@@ -11,6 +11,7 @@
   },
   "header": {
     "local": "Procesamiento local",
+    "localTooltip": "Tus archivos se procesan completamente en tu navegador. Nada se sube a ningún servidor.",
     "newScore": "← Nueva partitura"
   },
   "steps": {
