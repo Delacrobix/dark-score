@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
-// TODO: replace with real donation link (PayPal, Ko-fi, etc.)
-const DONATE_URL = 'https://ko-fi.com/placeholder'
+const KOFI_URL = 'https://ko-fi.com/R6R01X43VF'
+const KOFI_COLOR = '#FF5E5B'
 
 export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtle' | 'prominent' }>) {
   const { t } = useTranslation()
@@ -9,12 +9,13 @@ export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtl
   if (variant === 'prominent') {
     return (
       <a
-        href={DONATE_URL}
+        href={KOFI_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-800 hover:border-zinc-600 text-xs text-zinc-400 hover:text-white transition-colors"
+        className="inline-flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-white font-semibold transition-opacity hover:opacity-80"
+        style={{ backgroundColor: KOFI_COLOR }}
       >
-        <span aria-hidden="true">♥</span>
+        <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="" height="16" width="16" className="h-4 w-4" />
         {t('donate.label')}
       </a>
     )
@@ -22,12 +23,13 @@ export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtl
 
   return (
     <a
-      href={DONATE_URL}
+      href={KOFI_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-xs text-zinc-700 hover:text-zinc-400 transition-colors flex items-center gap-1"
+      className="text-xs transition-colors flex items-center gap-1 hover:opacity-80"
+      style={{ color: KOFI_COLOR }}
     >
-      <span aria-hidden="true">♥</span>
+      <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="" height="12" width="12" className="h-3 w-3" />
       {t('donate.label')}
     </a>
   )

@@ -1,7 +1,6 @@
 import ReactGA from 'react-ga4'
 
-// TODO: replace with real Google Analytics Measurement ID
-const GA_MEASUREMENT_ID = ''
+const GA_MEASUREMENT_ID = 'G-2J3KWD2X2C'
 
 export function initAnalytics() {
   if (!GA_MEASUREMENT_ID) return
