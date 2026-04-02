@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 
@@ -9,10 +9,9 @@ const MAX_ZOOM = 500
 
 export function PreviewCanvas() {
   const { t } = useTranslation()
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const { pages, currentPage, isLoading, loadingProgress } = useAppStore()
+  const { pages, currentPage, isLoading, loadingProgress, isProcessing } = useAppStore()
   const [zoomPercent, setZoomPercent] = useState(DEFAULT_ZOOM)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -22,15 +21,17 @@ export function PreviewCanvas() {
 
   const clampZoom = (v: number) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, v))
 
-  // Draw processed canvas — useLayoutEffect ensures it paints before browser renders
-  useLayoutEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas || !processedCanvas) return
-    const ctx = canvas.getContext('2d')!
-    canvas.width = processedCanvas.width
-    canvas.height = processedCanvas.height
-    ctx.drawImage(processedCanvas, 0, 0)
-  }, [processedCanvas])
+  // Draw on canvas via callback ref — fires when the element mounts in the DOM
+  const canvasRef = useCallback(
+    (canvas: HTMLCanvasElement | null) => {
+      if (!canvas || !processedCanvas) return
+      const ctx = canvas.getContext('2d')!
+      canvas.width = processedCanvas.width
+      canvas.height = processedCanvas.height
+      ctx.drawImage(processedCanvas, 0, 0)
+    },
+    [processedCanvas]
+  )
 
   useEffect(() => {
     setZoomPercent(DEFAULT_ZOOM)
@@ -51,8 +52,8 @@ export function PreviewCanvas() {
 
   const handleEditConfirm = () => {
     setIsEditing(false)
-    const val = parseInt(inputRef.current?.value ?? '', 10)
-    if (!isNaN(val) && val >= MIN_ZOOM) {
+    const val = Number.parseInt(inputRef.current?.value ?? '', 10)
+    if (!Number.isNaN(val) && val >= MIN_ZOOM) {
       setZoomPercent(clampZoom(val))
     }
   }
@@ -136,7 +137,7 @@ export function PreviewCanvas() {
       {/* Canvas container - centered when zoomed out */}
       <div
         ref={containerRef}
-        className="overflow-auto rounded-lg border border-zinc-800 max-h-[calc(100vh-200px)]"
+        className="overflow-auto rounded-lg border border-zinc-800 max-h-[calc(100vh-200px)] relative"
       >
         <div
           style={{
@@ -155,6 +156,11 @@ export function PreviewCanvas() {
             className="block"
           />
         </div>
+        {isProcessing && (
+          <div className="sticky top-0 left-0 w-full flex items-center justify-center bg-black/40 pointer-events-none" style={{ height: containerRef.current?.clientHeight ?? '100%', marginTop: -(containerRef.current?.scrollHeight ?? 0) }}>
+            <span className="text-3xl animate-spin" style={{ animationDuration: '1.5s' }}>♪</span>
+          </div>
+        )}
       </div>
     </div>
   )

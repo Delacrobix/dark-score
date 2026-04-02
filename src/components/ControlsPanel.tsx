@@ -5,7 +5,7 @@ import { HistoryPanel } from './HistoryPanel'
 
 export function ControlsPanel() {
   const { t } = useTranslation()
-  const { settings, applyPreset, updateSettings, resetSlider, isProcessing } = useAppStore()
+  const { settings, applyPreset, updateSettings, resetSlider } = useAppStore()
 
   return (
     <div className="flex flex-col gap-6 h-full overflow-y-auto">
@@ -110,12 +110,6 @@ export function ControlsPanel() {
       {/* History */}
       <HistoryPanel />
 
-      {isProcessing && (
-        <p className="text-xs text-zinc-600 flex items-center gap-1.5">
-          <span className="inline-block w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-          {' '}{t('controls.processing')}
-        </p>
-      )}
     </div>
   )
 }
