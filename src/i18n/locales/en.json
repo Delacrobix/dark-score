@@ -1,0 +1,71 @@
+{
+  "landing": {
+    "tagline": "Convert your sheet music to dark mode",
+    "description": "Reading sheet music on screen at night, or on a dark stage, with the traditional white background is exhausting for your eyes. Dark Score intelligently inverts the colors of your PDFs and images: it removes scan noise, thickens staff lines, and applies the color scheme you prefer.",
+    "cta": "Get started",
+    "privacy": {
+      "badge": "Your scores never leave your device",
+      "body": "We understand your scores are important to you. That is why this site never copies or sends your files to any external server. All processing happens directly in your browser, with no external connections.",
+      "github": "View source code on GitHub"
+    }
+  },
+  "header": {
+    "local": "Local processing",
+    "newScore": "← New score"
+  },
+  "steps": {
+    "upload": "Upload",
+    "adjust": "Adjust",
+    "download": "Download"
+  },
+  "upload": {
+    "prompt": "Drag your scores here",
+    "dragging": "Drop here",
+    "hint": "or click to select · PDF, PNG, JPG · max. {{size}} MB · multiple files supported",
+    "privacy": "Your scores never leave your device",
+    "errorFormat": "Unsupported format. Please use PDF, PNG or JPG.",
+    "errorSize": "File exceeds {{size}} MB."
+  },
+  "presets": {
+    "label": "Mode",
+    "stage":     { "name": "Dark stage",        "description": "AMOLED black" },
+    "study":     { "name": "Night study",       "description": "Soft gray" },
+    "pit":       { "name": "Orchestra pit",     "description": "Cream / amber" },
+    "classical": { "name": "Classical",         "description": "Dense scores" },
+    "jazz":      { "name": "Jazz",              "description": "Real book style" },
+    "pop":       { "name": "Pop / Rock",        "description": "Lead sheets" },
+    "bluelight": { "name": "Blue light filter", "description": "Late night" },
+    "custom":    { "name": "Custom",            "description": "Choose colors" },
+    "bgColor": "Background",
+    "fgColor": "Notation"
+  },
+  "controls": {
+    "label": "Adjustments",
+    "contrast": "Contrast",
+    "brightness": "Brightness",
+    "threshold": "Scan cleaning",
+    "dilation": "Line thickening",
+    "dilationWarning": "High level: notes in dense passages may bleed together.",
+    "reset": "Reset",
+    "processing": "Processing..."
+  },
+  "history": {
+    "label": "History",
+    "empty": "No changes yet",
+    "restore": "Restore",
+    "current": "Current"
+  },
+  "export": {
+    "button": "Download",
+    "exporting": "Exporting...",
+    "zipSuffix": " (ZIP)"
+  },
+  "splitView": {
+    "original": "Original",
+    "result": "Result",
+    "toggle": "Compare"
+  },
+  "donate": {
+    "label": "Support the project"
+  }
+}

@@ -1,4 +1,12 @@
-export type PresetId = 'stage' | 'study' | 'pit' | 'custom'
+export type PresetId =
+  | 'stage'
+  | 'study'
+  | 'pit'
+  | 'classical'
+  | 'jazz'
+  | 'pop'
+  | 'bluelight'
+  | 'custom'
 
 export type SliderKey = 'contrast' | 'brightness' | 'threshold' | 'dilation'
 
@@ -49,33 +57,75 @@ export interface WorkerResponse {
 
 export const PRESETS: Preset[] = [
   {
+    // Pure black + white, boosted contrast — maximum legibility on dark stages
     id: 'stage',
-    name: 'Escenario oscuro',
-    description: 'Negro AMOLED',
+    name: 'Dark stage',
+    description: 'AMOLED black',
     bgColor: '#000000',
     fgColor: '#ffffff',
     defaults: { contrast: 110, brightness: 100, threshold: 140, dilation: 0 },
   },
   {
+    // Very dark gray + light gray — less aggressive than pure black, easier for long sessions
     id: 'study',
-    name: 'Estudio nocturno',
-    description: 'Gris suave',
+    name: 'Night study',
+    description: 'Soft gray',
     bgColor: '#1a1a1a',
     fgColor: '#e0e0e0',
     defaults: { contrast: 100, brightness: 95, threshold: 130, dilation: 0 },
   },
   {
+    // Very dark brown + cream — warm amber tones reduce eye strain in dimly lit pits
     id: 'pit',
-    name: 'Foso de orquesta',
-    description: 'Crema / ámbar',
+    name: 'Orchestra pit',
+    description: 'Cream / amber',
     bgColor: '#1c1410',
     fgColor: '#f5e6c8',
     defaults: { contrast: 100, brightness: 90, threshold: 120, dilation: 1 },
   },
   {
+    // Classical scores are dense with fine notation — high threshold to clean old prints,
+    // no dilation to preserve spacing between close staff lines and small noteheads
+    id: 'classical',
+    name: 'Classical',
+    description: 'Dense scores',
+    bgColor: '#0f0f0f',
+    fgColor: '#efefef',
+    defaults: { contrast: 115, brightness: 98, threshold: 150, dilation: 0 },
+  },
+  {
+    // Jazz Real Book style — often handwritten or scanned PDFs with chord symbols.
+    // Lower threshold handles uneven ink from old photocopies; slight dilation helps thin lines.
+    id: 'jazz',
+    name: 'Jazz',
+    description: 'Real book style',
+    bgColor: '#141414',
+    fgColor: '#e8e0d0',
+    defaults: { contrast: 105, brightness: 92, threshold: 115, dilation: 1 },
+  },
+  {
+    // Pop/Rock lead sheets are simple with larger notation — slight dilation for bolder look,
+    // warmer tone for a relaxed reading feel
+    id: 'pop',
+    name: 'Pop / Rock',
+    description: 'Lead sheets',
+    bgColor: '#111318',
+    fgColor: '#dde3f0',
+    defaults: { contrast: 100, brightness: 100, threshold: 130, dilation: 1 },
+  },
+  {
+    // Very warm amber — filters blue light for late-night practice sessions
+    id: 'bluelight',
+    name: 'Blue light filter',
+    description: 'Late night',
+    bgColor: '#1a1200',
+    fgColor: '#ffd580',
+    defaults: { contrast: 95, brightness: 85, threshold: 125, dilation: 0 },
+  },
+  {
     id: 'custom',
-    name: 'Personalizado',
-    description: 'Elige colores',
+    name: 'Custom',
+    description: 'Choose colors',
     bgColor: '#000000',
     fgColor: '#ffffff',
     defaults: { contrast: 100, brightness: 100, threshold: 128, dilation: 0 },

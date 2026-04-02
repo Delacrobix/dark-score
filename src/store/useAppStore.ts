@@ -10,30 +10,37 @@ import {
   PRESETS,
 } from '../types'
 
-const MAX_HISTORY = 50
+const MAX_HISTORY = 30
+
+export interface SourceEntry {
+  file: File
+  type: SourceType
+}
+
+export interface HistoryEntry {
+  settings: ProcessingSettings
+  timestamp: number
+}
 
 interface AppState {
-  // Source file
-  sourceFile: File | null
-  sourceType: SourceType | null
+  sources: SourceEntry[]
   totalPages: number
   currentPage: number
   pages: PageData[]
   isLoading: boolean
   loadingProgress: number
 
-  // Settings (persisted)
   settings: ProcessingSettings
+  exportDpi: 200 | 300
 
-  // Undo/redo history
-  settingsHistory: ProcessingSettings[]
+  history: HistoryEntry[]
   historyIndex: number
 
-  // UI
   isProcessing: boolean
 
-  // Actions
-  setSourceFile: (file: File, type: SourceType) => void
+  setExportDpi: (dpi: 200 | 300) => void
+  setSources: (sources: SourceEntry[]) => void
+  addSources: (sources: SourceEntry[]) => void
   setTotalPages: (n: number) => void
   setCurrentPage: (n: number) => void
   setPageData: (page: PageData) => void
@@ -43,41 +50,49 @@ interface AppState {
   updateSettings: (partial: Partial<ProcessingSettings>) => void
   resetSlider: (key: SliderKey) => void
   applyPreset: (id: PresetId) => void
-  undo: () => void
-  redo: () => void
+  restoreFromHistory: (index: number) => void
   reset: () => void
 }
 
 function pushHistory(
-  history: ProcessingSettings[],
+  history: HistoryEntry[],
   index: number,
   next: ProcessingSettings
-): { settingsHistory: ProcessingSettings[]; historyIndex: number } {
+): { history: HistoryEntry[]; historyIndex: number } {
   const trimmed = history.slice(0, index + 1)
-  const newHistory = [...trimmed, next].slice(-MAX_HISTORY)
-  return { settingsHistory: newHistory, historyIndex: newHistory.length - 1 }
+  const entry: HistoryEntry = { settings: next, timestamp: Date.now() }
+  const newHistory = [...trimmed, entry].slice(-MAX_HISTORY)
+  return { history: newHistory, historyIndex: newHistory.length - 1 }
 }
+
+const initialHistory: HistoryEntry[] = [{ settings: DEFAULT_SETTINGS, timestamp: Date.now() }]
 
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      sourceFile: null,
-      sourceType: null,
+      sources: [],
       totalPages: 0,
       currentPage: 0,
       pages: [],
       isLoading: false,
       loadingProgress: 0,
       settings: DEFAULT_SETTINGS,
-      settingsHistory: [DEFAULT_SETTINGS],
+      exportDpi: 200,
+      history: initialHistory,
       historyIndex: 0,
       isProcessing: false,
 
-      setSourceFile: (file, type) =>
-        set({ sourceFile: file, sourceType: type, currentPage: 0, pages: [], totalPages: 0 }),
+      setExportDpi: (dpi) => set({ exportDpi: dpi }),
+
+      setSources: (sources) =>
+        set({ sources, currentPage: 0, pages: [], totalPages: 0 }),
+
+      addSources: (newSources) =>
+        set((state) => ({
+          sources: [...state.sources, ...newSources],
+        })),
 
       setTotalPages: (n) => set({ totalPages: n }),
-
       setCurrentPage: (n) => set({ currentPage: n }),
 
       setPageData: (page) =>
@@ -94,10 +109,7 @@ export const useAppStore = create<AppState>()(
       updateSettings: (partial) =>
         set((state) => {
           const next = { ...state.settings, ...partial }
-          return {
-            settings: next,
-            ...pushHistory(state.settingsHistory, state.historyIndex, next),
-          }
+          return { settings: next, ...pushHistory(state.history, state.historyIndex, next) }
         }),
 
       resetSlider: (key) =>
@@ -105,10 +117,7 @@ export const useAppStore = create<AppState>()(
           const preset = PRESETS.find((p) => p.id === state.settings.presetId)
           const defaultVal = preset?.defaults[key] ?? DEFAULT_SETTINGS[key]
           const next = { ...state.settings, [key]: defaultVal }
-          return {
-            settings: next,
-            ...pushHistory(state.settingsHistory, state.historyIndex, next),
-          }
+          return { settings: next, ...pushHistory(state.history, state.historyIndex, next) }
         }),
 
       applyPreset: (id) =>
@@ -118,35 +127,20 @@ export const useAppStore = create<AppState>()(
           const next: ProcessingSettings =
             id === 'custom'
               ? { ...state.settings, presetId: 'custom' }
-              : {
-                  ...state.settings,
-                  presetId: id,
-                  bgColor: preset.bgColor,
-                  fgColor: preset.fgColor,
-                  ...preset.defaults,
-                }
-          return {
-            settings: next,
-            ...pushHistory(state.settingsHistory, state.historyIndex, next),
-          }
+              : { ...state.settings, presetId: id, bgColor: preset.bgColor, fgColor: preset.fgColor, ...preset.defaults }
+          return { settings: next, ...pushHistory(state.history, state.historyIndex, next) }
         }),
 
-      undo: () =>
+      restoreFromHistory: (index) =>
         set((state) => {
-          const idx = Math.max(0, state.historyIndex - 1)
-          return { historyIndex: idx, settings: state.settingsHistory[idx] }
-        }),
-
-      redo: () =>
-        set((state) => {
-          const idx = Math.min(state.settingsHistory.length - 1, state.historyIndex + 1)
-          return { historyIndex: idx, settings: state.settingsHistory[idx] }
+          const entry = state.history[index]
+          if (!entry) return {}
+          return { settings: entry.settings, historyIndex: index }
         }),
 
       reset: () =>
         set({
-          sourceFile: null,
-          sourceType: null,
+          sources: [],
           totalPages: 0,
           currentPage: 0,
           pages: [],
@@ -159,7 +153,8 @@ export const useAppStore = create<AppState>()(
       name: 'dark-score-settings',
       partialize: (state) => ({
         settings: state.settings,
-        settingsHistory: state.settingsHistory,
+        exportDpi: state.exportDpi,
+        history: state.history,
         historyIndex: state.historyIndex,
       }),
     }

@@ -1,0 +1,71 @@
+{
+  "landing": {
+    "tagline": "Convierte tus partituras a modo oscuro",
+    "description": "Leer partituras en pantalla de noche, o en un escenario oscuro, con el fondo blanco tradicional es agotador para la vista. Dark Score invierte los colores de tus PDFs e imágenes de forma inteligente: elimina el ruido del escaneo, engrosa las líneas del pentagrama y aplica el esquema de color que prefieras.",
+    "cta": "Empezar",
+    "privacy": {
+      "badge": "Tus partituras nunca salen de tu dispositivo",
+      "body": "Entendemos que tus partituras son importantes para ti. Por ese motivo, esta web no copia ni envía tus archivos a ningún servidor externo. Todo el procesamiento ocurre directamente en tu navegador, sin conexiones externas.",
+      "github": "Ver código fuente en GitHub"
+    }
+  },
+  "header": {
+    "local": "Procesamiento local",
+    "newScore": "← Nueva partitura"
+  },
+  "steps": {
+    "upload": "Subir",
+    "adjust": "Ajustar",
+    "download": "Descargar"
+  },
+  "upload": {
+    "prompt": "Arrastra tus partituras aquí",
+    "dragging": "Suelta aquí",
+    "hint": "o haz clic para seleccionar · PDF, PNG, JPG · máx. {{size}} MB · varios archivos",
+    "privacy": "Tus partituras nunca salen de tu dispositivo",
+    "errorFormat": "Formato no soportado. Usa PDF, PNG o JPG.",
+    "errorSize": "El archivo supera los {{size}} MB."
+  },
+  "presets": {
+    "label": "Modo",
+    "stage":     { "name": "Escenario oscuro",    "description": "Negro AMOLED" },
+    "study":     { "name": "Estudio nocturno",    "description": "Gris suave" },
+    "pit":       { "name": "Foso de orquesta",    "description": "Crema / ámbar" },
+    "classical": { "name": "Clásica",             "description": "Partituras densas" },
+    "jazz":      { "name": "Jazz",                "description": "Estilo Real Book" },
+    "pop":       { "name": "Pop / Rock",          "description": "Lead sheets" },
+    "bluelight": { "name": "Filtro luz azul",     "description": "Noche tardía" },
+    "custom":    { "name": "Personalizado",       "description": "Elige colores" },
+    "bgColor": "Fondo",
+    "fgColor": "Notación"
+  },
+  "controls": {
+    "label": "Ajustes",
+    "contrast": "Contraste",
+    "brightness": "Brillo",
+    "threshold": "Limpieza de escaneo",
+    "dilation": "Engrosamiento de líneas",
+    "dilationWarning": "Nivel alto: las notas en pasajes densos pueden empastarse.",
+    "reset": "Restablecer",
+    "processing": "Procesando..."
+  },
+  "history": {
+    "label": "Historial",
+    "empty": "Sin cambios aún",
+    "restore": "Restaurar",
+    "current": "Actual"
+  },
+  "export": {
+    "button": "Descargar",
+    "exporting": "Exportando...",
+    "zipSuffix": " (ZIP)"
+  },
+  "splitView": {
+    "original": "Original",
+    "result": "Resultado",
+    "toggle": "Comparar"
+  },
+  "donate": {
+    "label": "Apoyar el proyecto"
+  }
+}
