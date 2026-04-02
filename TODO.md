@@ -3,9 +3,11 @@
 ## Pending
 
 - [ ] Fix: canvas not visible on initial document load (requires interaction to appear)
-- [ ] Add real donation link in `src/components/DonateButton.tsx` (replace `DONATE_URL` placeholder)
+- [x] Add real donation link in `src/components/DonateButton.tsx` (Ko-fi)
 - [ ] Add real GA Measurement ID in `src/lib/analytics.ts` (replace `GA_MEASUREMENT_ID` placeholder)
 - [ ] Add testing
+- [ ] Improve SEO
+- [ ] Reddit publication
 
 ## Completed
 

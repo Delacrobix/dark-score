@@ -1,73 +1,46 @@
-# React + TypeScript + Vite
+# Dark Score
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Convert your sheet music to dark mode. 100% private, 100% in your browser.
 
-Currently, two official plugins are available:
+Reading sheet music on screen at night or on a dark stage with a white background is exhausting for your eyes. Dark Score intelligently inverts the colors of your PDFs and images: it removes scan noise, thickens staff lines, and applies the color scheme you prefer.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Your files never leave your device.** All processing happens directly in your browser using Web Workers -- no uploads, no servers, no external connections.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **8 presets** tuned for different scenarios: dark stage, night study, orchestra pit, classical, jazz, pop/rock, blue light filter, and custom colors
+- **Adjustable settings**: contrast, brightness, scan cleaning, line thickening
+- **Batch processing**: upload multiple scores at once
+- **Export**: download as PDF or PNG (ZIP for multiple pages)
+- **Split view**: compare original vs. result side by side
+- **Zoom**: custom zoom level, Ctrl+scroll support
+- **DPI selector**: choose 200 or 300 DPI for PDF rendering
+- **i18n**: English and Spanish with auto language detection
+- **PWA**: installable as a standalone app
+- **Settings history**: restore any previous adjustment
 
-## Expanding the ESLint configuration
+## Tech stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 19 + TypeScript + Vite
+- Tailwind CSS v4
+- Zustand (state management)
+- pdf.js (PDF rendering)
+- Web Workers (image processing)
+- jsPDF + JSZip (export)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Getting started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Deploy to GitHub Pages
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run deploy
 ```
+
+## License
+
+MIT
