@@ -156,6 +156,26 @@ export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void;
           </div>
         </ResizablePanel>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-zinc-800 px-4 md:px-6 py-3 flex items-center justify-center gap-4 text-xs text-zinc-600">
+        <span>{t('footer.bugReport')}</span>
+        <a
+          href="mailto:rerindev@gmail.com"
+          className="hover:text-zinc-400 transition-colors"
+        >
+          rerindev@gmail.com
+        </a>
+        <span className="text-zinc-800">|</span>
+        <a
+          href="https://github.com/Delacrobix/dark-score/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-zinc-400 transition-colors"
+        >
+          GitHub Issues
+        </a>
+      </footer>
     </div>
   )
 }
