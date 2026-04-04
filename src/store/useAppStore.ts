@@ -4,55 +4,16 @@ import {
   type ProcessingSettings,
   type PageData,
   type PresetId,
-  type SourceType,
   type SliderKey,
+  type DocumentEntry,
+  type SourceEntry,
+  type HistoryEntry,
+  type ExportMode,
   DEFAULT_SETTINGS,
   PRESETS,
 } from '../types'
 
 const MAX_HISTORY = 30
-
-export interface SourceEntry {
-  file: File
-  type: SourceType
-}
-
-export interface HistoryEntry {
-  settings: ProcessingSettings
-  timestamp: number
-}
-
-interface AppState {
-  sources: SourceEntry[]
-  totalPages: number
-  currentPage: number
-  pages: PageData[]
-  isLoading: boolean
-  loadingProgress: number
-
-  settings: ProcessingSettings
-  exportDpi: 200 | 300
-
-  history: HistoryEntry[]
-  historyIndex: number
-
-  isProcessing: boolean
-
-  setExportDpi: (dpi: 200 | 300) => void
-  setSources: (sources: SourceEntry[]) => void
-  addSources: (sources: SourceEntry[]) => void
-  setTotalPages: (n: number) => void
-  setCurrentPage: (n: number) => void
-  setPageData: (page: PageData) => void
-  setIsLoading: (loading: boolean) => void
-  setLoadingProgress: (progress: number) => void
-  setIsProcessing: (processing: boolean) => void
-  updateSettings: (partial: Partial<ProcessingSettings>) => void
-  resetSlider: (key: SliderKey) => void
-  applyPreset: (id: PresetId) => void
-  restoreFromHistory: (index: number) => void
-  reset: () => void
-}
 
 function pushHistory(
   history: HistoryEntry[],
@@ -65,97 +26,247 @@ function pushHistory(
   return { history: newHistory, historyIndex: newHistory.length - 1 }
 }
 
-const initialHistory: HistoryEntry[] = [{ settings: DEFAULT_SETTINGS, timestamp: Date.now() }]
+function createDocument(source: SourceEntry, settings: ProcessingSettings): DocumentEntry {
+  return {
+    id: crypto.randomUUID(),
+    source,
+    label: source.file.name.replace(/\.[^.]+$/, ''),
+    settings,
+    history: [{ settings, timestamp: Date.now() }],
+    historyIndex: 0,
+    pages: [],
+    totalPages: 0,
+    currentPage: 0,
+    isLoading: false,
+    loadingProgress: 0,
+    isProcessing: false,
+  }
+}
+
+function updateDoc(docs: DocumentEntry[], index: number, patch: Partial<DocumentEntry>): DocumentEntry[] {
+  const updated = [...docs]
+  updated[index] = { ...updated[index], ...patch }
+  return updated
+}
+
+interface AppState {
+  documents: DocumentEntry[]
+  currentDocIndex: number
+
+  exportDpi: 200 | 300
+  exportMode: ExportMode
+  zoomPercent: number
+
+  setZoomPercent: (z: number) => void
+  setExportDpi: (dpi: 200 | 300) => void
+  setExportMode: (mode: ExportMode) => void
+
+  addDocuments: (sources: SourceEntry[], applyCurrentSettings?: boolean) => void
+  setCurrentDocIndex: (i: number) => void
+  removeDocument: (i: number) => void
+
+  updateSettings: (partial: Partial<ProcessingSettings>) => void
+  updateSettingsLive: (partial: Partial<ProcessingSettings>) => void
+  commitToHistory: () => void
+  resetSlider: (key: SliderKey) => void
+  applyPreset: (id: PresetId) => void
+  restoreFromHistory: (index: number) => void
+  applySettingsToAll: () => void
+
+  setDocTotalPages: (docIndex: number, n: number) => void
+  setDocCurrentPage: (page: number) => void
+  setDocPageData: (docIndex: number, page: PageData) => void
+  setDocLoading: (docIndex: number, loading: boolean) => void
+  setDocLoadingProgress: (docIndex: number, progress: number) => void
+  setDocProcessing: (docIndex: number, processing: boolean) => void
+
+  reset: () => void
+}
 
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      sources: [],
-      totalPages: 0,
-      currentPage: 0,
-      pages: [],
-      isLoading: false,
-      loadingProgress: 0,
-      settings: DEFAULT_SETTINGS,
+      documents: [],
+      currentDocIndex: 0,
+
       exportDpi: 200,
-      history: initialHistory,
-      historyIndex: 0,
-      isProcessing: false,
+      exportMode: 'separate',
+      zoomPercent: 100,
 
+      setZoomPercent: (z) => set({ zoomPercent: z }),
       setExportDpi: (dpi) => set({ exportDpi: dpi }),
+      setExportMode: (mode) => set({ exportMode: mode }),
 
-      setSources: (sources) =>
-        set({ sources, currentPage: 0, pages: [], totalPages: 0 }),
-
-      addSources: (newSources) =>
-        set((state) => ({
-          sources: [...state.sources, ...newSources],
-        })),
-
-      setTotalPages: (n) => set({ totalPages: n }),
-      setCurrentPage: (n) => set({ currentPage: n }),
-
-      setPageData: (page) =>
+      addDocuments: (sources, applyCurrentSettings = false) =>
         set((state) => {
-          const pages = [...state.pages]
-          pages[page.index] = page
-          return { pages }
+          const baseSettings = applyCurrentSettings && state.documents.length > 0
+            ? state.documents[state.currentDocIndex].settings
+            : DEFAULT_SETTINGS
+          const newDocs = sources.map((s) => createDocument(s, { ...baseSettings }))
+          return {
+            documents: [...state.documents, ...newDocs],
+            currentDocIndex: state.documents.length, // focus first new doc
+          }
         }),
 
-      setIsLoading: (loading) => set({ isLoading: loading }),
-      setLoadingProgress: (progress) => set({ loadingProgress: progress }),
-      setIsProcessing: (processing) => set({ isProcessing: processing }),
+      setCurrentDocIndex: (i) => set({ currentDocIndex: i }),
+
+      removeDocument: (i) =>
+        set((state) => {
+          const docs = state.documents.filter((_, idx) => idx !== i)
+          let newIndex = state.currentDocIndex
+          if (docs.length === 0) newIndex = 0
+          else if (newIndex >= docs.length) newIndex = docs.length - 1
+          else if (newIndex > i) newIndex = newIndex - 1
+          return { documents: docs, currentDocIndex: newIndex }
+        }),
 
       updateSettings: (partial) =>
         set((state) => {
-          const next = { ...state.settings, ...partial }
-          return { settings: next, ...pushHistory(state.history, state.historyIndex, next) }
+          const doc = state.documents[state.currentDocIndex]
+          if (!doc) return {}
+          const next = { ...doc.settings, ...partial }
+          const hist = pushHistory(doc.history, doc.historyIndex, next)
+          return {
+            documents: updateDoc(state.documents, state.currentDocIndex, {
+              settings: next,
+              ...hist,
+            }),
+          }
+        }),
+
+      updateSettingsLive: (partial) =>
+        set((state) => {
+          const doc = state.documents[state.currentDocIndex]
+          if (!doc) return {}
+          const next = { ...doc.settings, ...partial }
+          return {
+            documents: updateDoc(state.documents, state.currentDocIndex, {
+              settings: next,
+            }),
+          }
+        }),
+
+      commitToHistory: () =>
+        set((state) => {
+          const doc = state.documents[state.currentDocIndex]
+          if (!doc) return {}
+          const lastEntry = doc.history[doc.historyIndex]
+          if (lastEntry && JSON.stringify(lastEntry.settings) === JSON.stringify(doc.settings)) return {}
+          const hist = pushHistory(doc.history, doc.historyIndex, doc.settings)
+          return {
+            documents: updateDoc(state.documents, state.currentDocIndex, hist),
+          }
         }),
 
       resetSlider: (key) =>
         set((state) => {
-          const preset = PRESETS.find((p) => p.id === state.settings.presetId)
+          const doc = state.documents[state.currentDocIndex]
+          if (!doc) return {}
+          const preset = PRESETS.find((p) => p.id === doc.settings.presetId)
           const defaultVal = preset?.defaults[key] ?? DEFAULT_SETTINGS[key]
-          const next = { ...state.settings, [key]: defaultVal }
-          return { settings: next, ...pushHistory(state.history, state.historyIndex, next) }
+          const next = { ...doc.settings, [key]: defaultVal }
+          const hist = pushHistory(doc.history, doc.historyIndex, next)
+          return {
+            documents: updateDoc(state.documents, state.currentDocIndex, {
+              settings: next,
+              ...hist,
+            }),
+          }
         }),
 
       applyPreset: (id) =>
         set((state) => {
+          const doc = state.documents[state.currentDocIndex]
+          if (!doc) return {}
           const preset = PRESETS.find((p) => p.id === id)
           if (!preset) return {}
           const next: ProcessingSettings =
             id === 'custom'
-              ? { ...state.settings, presetId: 'custom' }
-              : { ...state.settings, presetId: id, bgColor: preset.bgColor, fgColor: preset.fgColor, ...preset.defaults }
-          return { settings: next, ...pushHistory(state.history, state.historyIndex, next) }
+              ? { ...doc.settings, presetId: 'custom' }
+              : { ...doc.settings, presetId: id, bgColor: preset.bgColor, fgColor: preset.fgColor, ...preset.defaults }
+          const hist = pushHistory(doc.history, doc.historyIndex, next)
+          return {
+            documents: updateDoc(state.documents, state.currentDocIndex, {
+              settings: next,
+              ...hist,
+            }),
+          }
         }),
 
       restoreFromHistory: (index) =>
         set((state) => {
-          const entry = state.history[index]
+          const doc = state.documents[state.currentDocIndex]
+          if (!doc) return {}
+          const entry = doc.history[index]
           if (!entry) return {}
-          return { settings: entry.settings, historyIndex: index }
+          return {
+            documents: updateDoc(state.documents, state.currentDocIndex, {
+              settings: entry.settings,
+              historyIndex: index,
+            }),
+          }
         }),
+
+      applySettingsToAll: () =>
+        set((state) => {
+          const doc = state.documents[state.currentDocIndex]
+          if (!doc) return {}
+          const docs = state.documents.map((d, i) => {
+            if (i === state.currentDocIndex) return d
+            const hist = pushHistory(d.history, d.historyIndex, doc.settings)
+            return { ...d, settings: { ...doc.settings }, ...hist }
+          })
+          return { documents: docs }
+        }),
+
+      setDocTotalPages: (docIndex, n) =>
+        set((state) => ({
+          documents: updateDoc(state.documents, docIndex, { totalPages: n }),
+        })),
+
+      setDocCurrentPage: (page) =>
+        set((state) => ({
+          documents: updateDoc(state.documents, state.currentDocIndex, { currentPage: page }),
+        })),
+
+      setDocPageData: (docIndex, page) =>
+        set((state) => {
+          const doc = state.documents[docIndex]
+          if (!doc) return {}
+          const pages = [...doc.pages]
+          pages[page.index] = page
+          return {
+            documents: updateDoc(state.documents, docIndex, { pages }),
+          }
+        }),
+
+      setDocLoading: (docIndex, loading) =>
+        set((state) => ({
+          documents: updateDoc(state.documents, docIndex, { isLoading: loading }),
+        })),
+
+      setDocLoadingProgress: (docIndex, progress) =>
+        set((state) => ({
+          documents: updateDoc(state.documents, docIndex, { loadingProgress: progress }),
+        })),
+
+      setDocProcessing: (docIndex, processing) =>
+        set((state) => ({
+          documents: updateDoc(state.documents, docIndex, { isProcessing: processing }),
+        })),
 
       reset: () =>
         set({
-          sources: [],
-          totalPages: 0,
-          currentPage: 0,
-          pages: [],
-          isLoading: false,
-          loadingProgress: 0,
-          isProcessing: false,
+          documents: [],
+          currentDocIndex: 0,
         }),
     }),
     {
       name: 'dark-score-settings',
       partialize: (state) => ({
-        settings: state.settings,
         exportDpi: state.exportDpi,
-        history: state.history,
-        historyIndex: state.historyIndex,
+        exportMode: state.exportMode,
       }),
     }
   )

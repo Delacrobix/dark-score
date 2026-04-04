@@ -9,15 +9,21 @@ import { ControlsPanel } from './ControlsPanel'
 import { ExportButton } from './ExportButton'
 import { LanguageSelector } from './LanguageSelector'
 import { DonateButton } from './DonateButton'
+import { DocumentTabs } from './DocumentTabs'
 
-export function AppShell({ onGoHome }: Readonly<{ onGoHome: () => void }>) {
+export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void; onAbout: () => void }>) {
   const { t } = useTranslation()
   const [comparing, setComparing] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   useProcessor()
 
-  const { sources, totalPages, currentPage, setCurrentPage, reset, pages } = useAppStore()
-  const hasFile = sources.length > 0
-  const hasResult = pages[currentPage]?.processedCanvas != null
+  const { documents, currentDocIndex, reset } = useAppStore()
+  const currentDoc = documents[currentDocIndex] ?? null
+  const hasFile = documents.length > 0
+  const hasResult = currentDoc?.pages[currentDoc.currentPage]?.processedCanvas != null
+  const totalPages = currentDoc?.totalPages ?? 0
+  const currentPage = currentDoc?.currentPage ?? 0
+  const setCurrentPage = useAppStore((s) => s.setDocCurrentPage)
 
   const handleGoHome = () => {
     reset()
@@ -27,7 +33,7 @@ export function AppShell({ onGoHome }: Readonly<{ onGoHome: () => void }>) {
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-zinc-800 px-6 py-4 flex items-center gap-3">
+      <header className="border-b border-zinc-800 px-4 md:px-6 py-3 md:py-4 flex items-center gap-3 relative">
         <button
           onClick={handleGoHome}
           className="flex items-center gap-2 cursor-pointer hover:opacity-75 transition-opacity"
@@ -37,16 +43,25 @@ export function AppShell({ onGoHome }: Readonly<{ onGoHome: () => void }>) {
           <span className="font-semibold text-white tracking-tight">Dark Score</span>
         </button>
 
-        {hasFile && (
-          <button
-            onClick={reset}
-            className="ml-3 text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
-          >
-            {t('header.newScore')}
-          </button>
-        )}
+        {/* Desktop/tablet nav */}
+        <div className="hidden md:flex items-center gap-3 ml-3">
+          {hasFile && (
+            <button
+              onClick={reset}
+              className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
+            >
+              {t('header.newScore')}
+            </button>
+          )}
+        </div>
 
-        <div className="ml-auto flex items-center gap-4">
+        <div className="hidden md:flex ml-auto items-center gap-4">
+          <button
+            onClick={onAbout}
+            className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
+          >
+            About
+          </button>
           <DonateButton />
           <LanguageSelector />
           <span className="text-xs text-zinc-700 flex items-center gap-1.5 relative group">
@@ -64,11 +79,52 @@ export function AppShell({ onGoHome }: Readonly<{ onGoHome: () => void }>) {
             </span>
           </span>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMenuOpen((o) => !o)}
+          className="md:hidden ml-auto w-8 h-8 flex flex-col items-center justify-center gap-1 cursor-pointer"
+          aria-label="Menu"
+        >
+          <span className={`block w-4 h-0.5 bg-zinc-400 transition-all ${menuOpen ? 'rotate-45 translate-y-[3px]' : ''}`} />
+          <span className={`block w-4 h-0.5 bg-zinc-400 transition-all ${menuOpen ? '-rotate-45 -translate-y-[3px]' : ''}`} />
+        </button>
+
+        {/* Mobile dropdown */}
+        {menuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex flex-col gap-3 z-50">
+            {hasFile && (
+              <button
+                onClick={() => { reset(); setMenuOpen(false) }}
+                className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer text-left"
+              >
+                {t('header.newScore')}
+              </button>
+            )}
+            <button
+              onClick={() => { onAbout(); setMenuOpen(false) }}
+              className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer text-left"
+            >
+              About
+            </button>
+            <DonateButton />
+            <LanguageSelector />
+            <span className="text-xs text-zinc-500 flex items-center gap-1.5">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              {t('header.local')}
+            </span>
+          </div>
+        )}
       </header>
+
+      {/* Document tabs */}
+      <DocumentTabs />
 
       {/* Main */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        <div className="flex-1 flex flex-col items-center justify-center p-8 border-r border-zinc-800 gap-4 overflow-auto min-w-0">
+        <div className="flex-1 flex flex-col items-center justify-center p-2 md:p-8 border-r border-zinc-800 gap-4 overflow-auto min-w-0">
           {hasFile ? (
             <>
               {hasResult && (
@@ -134,8 +190,8 @@ function ResizablePanel({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <div
       ref={panelRef}
-      className="relative flex flex-col gap-6 p-6 border-t border-zinc-800 lg:border-t-0 shrink-0"
-      style={{ width }}
+      className="relative flex flex-col gap-6 p-4 md:p-6 border-t border-zinc-800 lg:border-t-0 w-full lg:shrink-0"
+      style={{ width: globalThis.window !== undefined && globalThis.innerWidth >= 1024 ? width : undefined }}
     >
       <button
         type="button"

@@ -10,7 +10,10 @@ function formatTime(timestamp: number): string {
 
 export function HistoryPanel() {
   const { t } = useTranslation()
-  const { history, historyIndex, restoreFromHistory } = useAppStore()
+  const { documents, currentDocIndex, restoreFromHistory } = useAppStore()
+  const currentDoc = documents[currentDocIndex]
+  const history = currentDoc?.history ?? []
+  const historyIndex = currentDoc?.historyIndex ?? 0
   const [open, setOpen] = useState(false)
 
   // Show most recent first

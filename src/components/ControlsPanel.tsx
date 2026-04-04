@@ -1,11 +1,14 @@
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
-import { PRESETS } from '../types'
+import { PRESETS, DEFAULT_SETTINGS } from '../types'
 import { HistoryPanel } from './HistoryPanel'
 
 export function ControlsPanel() {
   const { t } = useTranslation()
-  const { settings, applyPreset, updateSettings, resetSlider } = useAppStore()
+  const { documents, currentDocIndex, applyPreset, updateSettingsLive, commitToHistory, resetSlider, applySettingsToAll } = useAppStore()
+  const currentDoc = documents[currentDocIndex]
+  const settings = currentDoc?.settings ?? DEFAULT_SETTINGS
+  const showApplyAll = documents.length > 1
 
   return (
     <div className="flex flex-col gap-6 h-full overflow-y-auto">
@@ -41,7 +44,8 @@ export function ControlsPanel() {
               <input
                 type="color"
                 value={settings.bgColor}
-                onChange={(e) => updateSettings({ bgColor: e.target.value })}
+                onChange={(e) => updateSettingsLive({ bgColor: e.target.value })}
+                onBlur={commitToHistory}
                 className="w-full h-8 rounded cursor-pointer border border-zinc-700 bg-transparent"
               />
             </label>
@@ -50,7 +54,8 @@ export function ControlsPanel() {
               <input
                 type="color"
                 value={settings.fgColor}
-                onChange={(e) => updateSettings({ fgColor: e.target.value })}
+                onChange={(e) => updateSettingsLive({ fgColor: e.target.value })}
+                onBlur={commitToHistory}
                 className="w-full h-8 rounded cursor-pointer border border-zinc-700 bg-transparent"
               />
             </label>
@@ -69,7 +74,8 @@ export function ControlsPanel() {
             label={t('controls.contrast')}
             value={settings.contrast}
             min={0} max={200}
-            onChange={(v) => updateSettings({ contrast: v })}
+            onChange={(v) => updateSettingsLive({ contrast: v })}
+            onCommit={commitToHistory}
             onReset={() => resetSlider('contrast')}
             format={(v) => `${v}%`}
           />
@@ -77,7 +83,8 @@ export function ControlsPanel() {
             label={t('controls.brightness')}
             value={settings.brightness}
             min={0} max={200}
-            onChange={(v) => updateSettings({ brightness: v })}
+            onChange={(v) => updateSettingsLive({ brightness: v })}
+            onCommit={commitToHistory}
             onReset={() => resetSlider('brightness')}
             format={(v) => `${v}%`}
           />
@@ -85,7 +92,8 @@ export function ControlsPanel() {
             label={t('controls.threshold')}
             value={settings.threshold}
             min={0} max={255}
-            onChange={(v) => updateSettings({ threshold: v })}
+            onChange={(v) => updateSettingsLive({ threshold: v })}
+            onCommit={commitToHistory}
             onReset={() => resetSlider('threshold')}
             format={String}
           />
@@ -94,7 +102,8 @@ export function ControlsPanel() {
               label={t('controls.dilation')}
               value={settings.dilation}
               min={0} max={3} step={1}
-              onChange={(v) => updateSettings({ dilation: v })}
+              onChange={(v) => updateSettingsLive({ dilation: v })}
+              onCommit={commitToHistory}
               onReset={() => resetSlider('dilation')}
               format={String}
             />
@@ -106,6 +115,16 @@ export function ControlsPanel() {
           </div>
         </div>
       </section>
+
+      {/* Apply to all documents */}
+      {showApplyAll && (
+        <button
+          onClick={applySettingsToAll}
+          className="text-xs px-3 py-2 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors cursor-pointer"
+        >
+          {t('documents.applyToAll')}
+        </button>
+      )}
 
       {/* History */}
       <HistoryPanel />
@@ -121,11 +140,12 @@ interface SliderProps {
   max: number
   step?: number
   onChange: (v: number) => void
+  onCommit: () => void
   onReset: () => void
   format: (v: number) => string
 }
 
-function Slider({ label, value, min, max, step = 1, onChange, onReset, format }: Readonly<SliderProps>) {
+function Slider({ label, value, min, max, step = 1, onChange, onCommit, onReset, format }: Readonly<SliderProps>) {
   const { t } = useTranslation()
   return (
     <div>
@@ -146,6 +166,8 @@ function Slider({ label, value, min, max, step = 1, onChange, onReset, format }:
         type="range"
         min={min} max={max} step={step} value={value}
         onChange={(e) => onChange(Number(e.target.value))}
+        onMouseUp={onCommit}
+        onTouchEnd={onCommit}
         className="w-full accent-purple-400 cursor-pointer"
       />
     </div>

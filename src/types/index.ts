@@ -44,6 +44,33 @@ export interface PageData {
 
 export type SourceType = 'pdf' | 'image'
 
+export interface SourceEntry {
+  file: File
+  type: SourceType
+}
+
+export interface HistoryEntry {
+  settings: ProcessingSettings
+  timestamp: number
+}
+
+export type ExportMode = 'merged' | 'separate'
+
+export interface DocumentEntry {
+  id: string
+  source: SourceEntry
+  label: string
+  settings: ProcessingSettings
+  history: HistoryEntry[]
+  historyIndex: number
+  pages: PageData[]
+  totalPages: number
+  currentPage: number
+  isLoading: boolean
+  loadingProgress: number
+  isProcessing: boolean
+}
+
 export interface WorkerRequest {
   id: number
   imageData: ImageData

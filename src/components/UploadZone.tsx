@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useAppStore, type SourceEntry } from '../store/useAppStore'
-import type { SourceType } from '../types'
+import { useAppStore } from '../store/useAppStore'
+import type { SourceType, SourceEntry } from '../types'
 
 const ACCEPTED_EXT = ['.pdf', '.png', '.jpg', '.jpeg']
 const MAX_SIZE_MB = 50
@@ -14,7 +14,7 @@ function getSourceType(file: File): SourceType | null {
 
 export function UploadZone() {
   const { t } = useTranslation()
-  const setSources = useAppStore((s) => s.setSources)
+  const addDocuments = useAppStore((s) => s.addDocuments)
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -37,9 +37,9 @@ export function UploadZone() {
         entries.push({ file, type })
       }
 
-      if (entries.length > 0) setSources(entries)
+      if (entries.length > 0) addDocuments(entries)
     },
-    [setSources, t]
+    [addDocuments, t]
   )
 
   const onDrop = useCallback(

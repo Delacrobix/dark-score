@@ -56,10 +56,16 @@
     "restore": "Restaurar",
     "current": "Actual"
   },
+  "documents": {
+    "applyToAll": "Aplicar a todos los documentos",
+    "addMore": "+ Agregar archivos"
+  },
   "export": {
     "button": "Descargar",
     "exporting": "Exportando...",
-    "zipSuffix": " (ZIP)"
+    "zipSuffix": " (ZIP)",
+    "merged": "Unificado",
+    "separate": "Separado"
   },
   "splitView": {
     "original": "Original",
@@ -68,5 +74,47 @@
   },
   "donate": {
     "label": "Apoyar el proyecto"
+  },
+  "about": {
+    "title": "Acerca de Dark Score",
+    "why": {
+      "title": "Por que Dark Score?",
+      "body": "Los musicos que practican de noche, tocan en escenarios oscuros o leen desde tablets durante horas conocen el problema: una partitura blanca en una pantalla brillante cansa la vista. Dark Score nacio para resolver esto. Convierte tus PDFs e imagenes a modo oscuro en segundos, para que puedas enfocarte en la musica."
+    },
+    "useCases": {
+      "title": "Para quien es?",
+      "nightOwls": {
+        "title": "Trasnochadores",
+        "body": "Practica hasta tarde sin cansar la vista. El preset de filtro de luz azul esta disenado para sesiones largas con poca luz."
+      },
+      "stagePerformers": {
+        "title": "Musicos en escenario",
+        "body": "Una pantalla blanca brillante en un teatro oscuro distrae al publico y arruina tu vision nocturna. El preset de escenario oscuro te da negro AMOLED con notacion de alto contraste."
+      },
+      "orchestraPit": {
+        "title": "Musicos de foso",
+        "body": "Los musicos de foso necesitan leer bajo la tenue luz del atril. El preset ambar reduce el brillo mientras mantiene la notacion legible."
+      },
+      "teachers": {
+        "title": "Profesores y estudiantes",
+        "body": "Preparando material para clases en pantalla? Convierte tus partituras a modo oscuro para que los estudiantes lean comodamente en cualquier dispositivo."
+      },
+      "custom": {
+        "title": "Necesidades especificas",
+        "body": "Elige tus propios colores de fondo y notacion, ajusta contraste y brillo, y engrosa lineas delgadas de escaneos antiguos. Haz que tus partituras se vean exactamente como quieres."
+      }
+    },
+    "privacy": {
+      "title": "Tus archivos se quedan en tu dispositivo",
+      "howItWorks": "Dark Score procesa todo directamente en tu navegador usando una tecnologia llamada Web Workers. Esto significa:",
+      "points": [
+        "Tus archivos nunca se suben a ningun servidor",
+        "No se necesita conexion a internet despues de cargar la pagina",
+        "Nadie mas puede ver ni acceder a tus partituras",
+        "El codigo fuente es abierto y auditable en GitHub"
+      ],
+      "why": "Lo construi asi porque entiendo que las partituras pueden ser material con derechos de autor, arreglos personales o composiciones ineditas. Tu trabajo merece seguir siendo tuyo."
+    },
+    "backToHome": "Volver al inicio"
   }
 }

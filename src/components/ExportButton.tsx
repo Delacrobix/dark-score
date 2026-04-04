@@ -3,30 +3,44 @@ import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { exportAsPdf, exportAsPng } from '../lib/exporter'
 import type { ExportFormat } from '../lib/exporter'
+import type { ExportMode } from '../types'
 
 const DPI_OPTIONS = [200, 300] as const
 
 export function ExportButton() {
   const { t } = useTranslation()
-  const { pages, sources, exportDpi, setExportDpi } = useAppStore()
-  const hasPdf = sources.some((s) => s.type === 'pdf')
-  const [format, setFormat] = useState<ExportFormat>(hasPdf ? 'pdf' : 'png')
+  const { documents, exportDpi, exportMode, setExportDpi, setExportMode } = useAppStore()
+  const hasPdf = documents.some((d) => d.source.type === 'pdf')
+  const [format, setFormat] = useState<ExportFormat>('pdf')
   const [exporting, setExporting] = useState(false)
 
-  const hasResult = pages.some((p) => p?.processedCanvas)
-  const multiPage = pages.filter((p) => p?.processedCanvas).length > 1
-  const baseName = sources.length === 1
-    ? (sources[0].file.name.replace(/\.[^.]+$/, '') ?? 'dark-score')
-    : 'dark-score-batch'
+  const hasResult = documents.some((d) => d.pages.some((p) => p?.processedCanvas))
+  const multiDoc = documents.length > 1
+  const allPages = documents.flatMap((d) => d.pages)
+  const multiPage = allPages.filter((p) => p?.processedCanvas).length > 1
 
   const handleExport = async () => {
     if (!hasResult || exporting) return
     setExporting(true)
     try {
-      if (format === 'pdf') {
-        await exportAsPdf(pages, `${baseName}.pdf`)
+      if (format === 'png') {
+        // PNG: always export each document separately
+        for (const doc of documents) {
+          const readyPages = doc.pages.filter((p) => p?.processedCanvas)
+          if (readyPages.length === 0) continue
+          await exportAsPng(readyPages, doc.label)
+        }
+      } else if (multiDoc && exportMode === 'separate') {
+        // PDF separate: one PDF per document
+        for (const doc of documents) {
+          const readyPages = doc.pages.filter((p) => p?.processedCanvas)
+          if (readyPages.length === 0) continue
+          await exportAsPdf(readyPages, `${doc.label}.pdf`)
+        }
       } else {
-        await exportAsPng(pages, baseName)
+        // PDF merged or single doc
+        const baseName = documents.length === 1 ? documents[0].label : 'dark-score-batch'
+        await exportAsPdf(allPages, `${baseName}.pdf`)
       }
     } finally {
       setExporting(false)
@@ -49,6 +63,22 @@ export function ExportButton() {
           </button>
         ))}
       </div>
+
+      {/* Export mode (merged vs separate) - only for PDF */}
+      {multiDoc && format === 'pdf' && (
+        <div className="flex rounded-lg overflow-hidden border border-zinc-800 text-xs">
+          {(['separate', 'merged'] as ExportMode[]).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setExportMode(mode)}
+              className={`flex-1 py-1.5 font-medium transition-colors cursor-pointer
+                ${exportMode === mode ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+            >
+              {t(`export.${mode}`)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* DPI selector (only for PDFs) */}
       {hasPdf && (
