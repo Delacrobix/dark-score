@@ -43,8 +43,8 @@ export async function exportAsPdf(pages: PageData[], filename = 'dark-score.pdf'
       pdf.addPage([canvas.width, canvas.height], canvas.width > canvas.height ? 'l' : 'p')
     }
 
-    const dataUrl = canvas.toDataURL('image/png')
-    pdf.addImage(dataUrl, 'PNG', 0, 0, canvas.width, canvas.height)
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
+    pdf.addImage(dataUrl, 'JPEG', 0, 0, canvas.width, canvas.height)
   }
 
   pdf.save(filename)
