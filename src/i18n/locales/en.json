@@ -6,7 +6,8 @@
     "privacy": {
       "badge": "Your scores never leave your device",
       "body": "We understand your scores are important to you. That is why this site never copies or sends your files to any external server. All processing happens directly in your browser, with no external connections.",
-      "github": "View source code on GitHub"
+      "github": "View source code on GitHub",
+      "learnMore": "Learn more →"
     }
   },
   "header": {
@@ -55,6 +56,9 @@
     "empty": "No changes yet",
     "restore": "Restore",
     "current": "Current"
+  },
+  "footer": {
+    "bugReport": "Found a bug?"
   },
   "documents": {
     "applyToAll": "Apply to all documents",

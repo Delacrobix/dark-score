@@ -6,7 +6,8 @@
     "privacy": {
       "badge": "Tus partituras nunca salen de tu dispositivo",
       "body": "Entendemos que tus partituras son importantes para ti. Por ese motivo, esta web no copia ni envía tus archivos a ningún servidor externo. Todo el procesamiento ocurre directamente en tu navegador, sin conexiones externas.",
-      "github": "Ver código fuente en GitHub"
+      "github": "Ver código fuente en GitHub",
+      "learnMore": "Saber mas →"
     }
   },
   "header": {
@@ -55,6 +56,9 @@
     "empty": "Sin cambios aún",
     "restore": "Restaurar",
     "current": "Actual"
+  },
+  "footer": {
+    "bugReport": "Encontraste un bug?"
   },
   "documents": {
     "applyToAll": "Aplicar a todos los documentos",

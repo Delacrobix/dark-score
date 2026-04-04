@@ -31,9 +31,12 @@ export function DocumentTabs() {
   return (
     <div className="flex items-center gap-1 px-2 md:px-6 py-1.5 border-b border-zinc-800 overflow-x-auto">
       {documents.map((doc, i) => (
-        <button
+        <div
           key={doc.id}
+          role="tab"
+          tabIndex={0}
           onClick={() => setCurrentDocIndex(i)}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setCurrentDocIndex(i) }}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-colors cursor-pointer shrink-0
             ${i === currentDocIndex
               ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30'
@@ -53,7 +56,7 @@ export function DocumentTabs() {
           >
             x
           </button>
-        </button>
+        </div>
       ))}
 
       <button

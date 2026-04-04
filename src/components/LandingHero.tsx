@@ -74,7 +74,7 @@ export function LandingHero({ onGetStarted, onAbout }: Readonly<LandingHeroProps
             onClick={onAbout}
             className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
           >
-            Learn more →
+            {t('landing.privacy.learnMore')}
           </button>
         </div>
       </div>
