@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
+import { trackEvent } from '../lib/analytics'
 import type { SourceType, SourceEntry } from '../types'
 
 const ACCEPTED_EXT = ['.pdf', '.png', '.jpg', '.jpeg']
@@ -37,7 +38,12 @@ export function UploadZone() {
         entries.push({ file, type })
       }
 
-      if (entries.length > 0) addDocuments(entries)
+      if (entries.length > 0) {
+        addDocuments(entries)
+        const pdfCount = entries.filter((e) => e.type === 'pdf').length
+        const imageCount = entries.filter((e) => e.type === 'image').length
+        trackEvent('upload', 'upload_files', `pdf:${pdfCount},image:${imageCount}`)
+      }
     },
     [addDocuments, t]
   )

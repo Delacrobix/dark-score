@@ -4,6 +4,7 @@ import { useAppStore } from '../store/useAppStore'
 import { exportAsPdf, exportAsPng } from '../lib/exporter'
 import type { ExportFormat } from '../lib/exporter'
 import type { ExportMode } from '../types'
+import { trackEvent } from '../lib/analytics'
 
 const DPI_OPTIONS = [200, 300] as const
 
@@ -22,6 +23,8 @@ export function ExportButton() {
   const handleExport = async () => {
     if (!hasResult || exporting) return
     setExporting(true)
+    const mode = multiDoc ? exportMode : 'single'
+    trackEvent('export', 'export_file', `format:${format},mode:${mode},docs:${documents.length}`)
     try {
       if (format === 'png') {
         // PNG: always export each document separately

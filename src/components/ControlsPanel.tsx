@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
+import { trackEvent } from '../lib/analytics'
 import { PRESETS, DEFAULT_SETTINGS } from '../types'
 import { HistoryPanel } from './HistoryPanel'
 
@@ -23,7 +24,7 @@ export function ControlsPanel() {
             return (
               <button
                 key={preset.id}
-                onClick={() => applyPreset(preset.id)}
+                onClick={() => { applyPreset(preset.id); trackEvent('preset', 'apply_preset', preset.id) }}
                 className={`text-left px-3 py-2.5 rounded-lg border transition-colors text-xs cursor-pointer
                   ${active
                     ? 'border-purple-500 bg-purple-500/10 text-white'
