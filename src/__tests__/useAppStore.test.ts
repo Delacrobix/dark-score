@@ -273,7 +273,7 @@ describe('useAppStore', () => {
   describe('pages and navigation', () => {
     it('setDocTotalPages updates total on specific doc', () => {
       addOneDoc()
-      getState().setDocTotalPages(0, 5)
+      getState().setDocTotalPages(currentDoc().id, 5)
       expect(currentDoc().totalPages).toBe(5)
     })
 
@@ -290,7 +290,7 @@ describe('useAppStore', () => {
         originalImageData: new ImageData(1, 1),
         processedCanvas: null as unknown as HTMLCanvasElement,
       }
-      getState().setDocPageData(0, page)
+      getState().setDocPageData(currentDoc().id, page)
       expect(currentDoc().pages[0]).toEqual(page)
     })
   })
@@ -304,10 +304,10 @@ describe('useAppStore', () => {
       const page0 = { index: 0, originalImageData: new ImageData(1, 1), processedCanvas: null as unknown as HTMLCanvasElement }
       const page1 = { index: 1, originalImageData: new ImageData(1, 1), processedCanvas: null as unknown as HTMLCanvasElement }
       const page2 = { index: 2, originalImageData: new ImageData(1, 1), processedCanvas: null as unknown as HTMLCanvasElement }
-      getState().setDocPageData(0, page0)
-      getState().setDocPageData(0, page1)
-      getState().setDocPageData(0, page2)
-      getState().setDocTotalPages(0, 3)
+      getState().setDocPageData(currentDoc().id, page0)
+      getState().setDocPageData(currentDoc().id, page1)
+      getState().setDocPageData(currentDoc().id, page2)
+      getState().setDocTotalPages(currentDoc().id, 3)
 
       // Change settings while on page 0
       getState().setDocCurrentPage(0)
@@ -324,9 +324,9 @@ describe('useAppStore', () => {
       addOneDoc()
       const page0 = { index: 0, originalImageData: new ImageData(1, 1), processedCanvas: null as unknown as HTMLCanvasElement }
       const page1 = { index: 1, originalImageData: new ImageData(1, 1), processedCanvas: null as unknown as HTMLCanvasElement }
-      getState().setDocPageData(0, page0)
-      getState().setDocPageData(0, page1)
-      getState().setDocTotalPages(0, 2)
+      getState().setDocPageData(currentDoc().id, page0)
+      getState().setDocPageData(currentDoc().id, page1)
+      getState().setDocTotalPages(currentDoc().id, 2)
 
       const historyBefore = currentDoc().history.length
       getState().updateSettingsLive({ brightness: 60 })

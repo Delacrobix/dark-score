@@ -131,10 +131,10 @@ export function useProcessor() {
       loadedDocIdsRef.current.add(doc.id)
       const signal = { cancelled: false }
       signals.push(signal)
-      const docIndex = i
+      const docId = doc.id
 
-      setDocLoading(docIndex, true)
-      setDocLoadingProgress(docIndex, 0)
+      setDocLoading(docId, true)
+      setDocLoadingProgress(docId, 0)
 
       const run = async () => {
         try {
@@ -143,13 +143,13 @@ export function useProcessor() {
             exportDpi,
             doc.settings,
             sendToWorker,
-            (n) => setDocTotalPages(docIndex, n),
-            (page) => setDocPageData(docIndex, page),
-            (progress) => setDocLoadingProgress(docIndex, progress),
+            (n) => setDocTotalPages(docId, n),
+            (page) => setDocPageData(docId, page),
+            (progress) => setDocLoadingProgress(docId, progress),
             signal
           )
         } finally {
-          if (!signal.cancelled) setDocLoading(docIndex, false)
+          if (!signal.cancelled) setDocLoading(docId, false)
         }
       }
 
@@ -179,17 +179,17 @@ export function useProcessor() {
     if (pagesWithData.length === 0) return
 
     const signal = { cancelled: false }
-    const docIndex = store.currentDocIndex
-    setDocProcessing(docIndex, true)
+    const docId = doc.id
+    setDocProcessing(docId, true)
 
     const reprocessAll = async () => {
       for (const page of pagesWithData) {
         if (signal.cancelled) return
         const processed = await sendToWorker(cloneImageData(page.originalImageData), doc.settings)
         if (signal.cancelled) return
-        setDocPageData(docIndex, { ...page, processedCanvas: putImageDataOnCanvas(processed) })
+        setDocPageData(docId, { ...page, processedCanvas: putImageDataOnCanvas(processed) })
       }
-      if (!signal.cancelled) setDocProcessing(docIndex, false)
+      if (!signal.cancelled) setDocProcessing(docId, false)
     }
 
     reprocessAll()

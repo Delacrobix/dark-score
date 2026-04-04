@@ -43,6 +43,10 @@ function createDocument(source: SourceEntry, settings: ProcessingSettings): Docu
   }
 }
 
+function updateDocById(docs: DocumentEntry[], id: string, patch: Partial<DocumentEntry>): DocumentEntry[] {
+  return docs.map((d) => d.id === id ? { ...d, ...patch } : d)
+}
+
 function updateDoc(docs: DocumentEntry[], index: number, patch: Partial<DocumentEntry>): DocumentEntry[] {
   const updated = [...docs]
   updated[index] = { ...updated[index], ...patch }
@@ -73,12 +77,12 @@ interface AppState {
   restoreFromHistory: (index: number) => void
   applySettingsToAll: () => void
 
-  setDocTotalPages: (docIndex: number, n: number) => void
+  setDocTotalPages: (docId: string, n: number) => void
   setDocCurrentPage: (page: number) => void
-  setDocPageData: (docIndex: number, page: PageData) => void
-  setDocLoading: (docIndex: number, loading: boolean) => void
-  setDocLoadingProgress: (docIndex: number, progress: number) => void
-  setDocProcessing: (docIndex: number, processing: boolean) => void
+  setDocPageData: (docId: string, page: PageData) => void
+  setDocLoading: (docId: string, loading: boolean) => void
+  setDocLoadingProgress: (docId: string, progress: number) => void
+  setDocProcessing: (docId: string, processing: boolean) => void
 
   reset: () => void
 }
@@ -220,9 +224,9 @@ export const useAppStore = create<AppState>()(
           return { documents: docs }
         }),
 
-      setDocTotalPages: (docIndex, n) =>
+      setDocTotalPages: (docId, n) =>
         set((state) => ({
-          documents: updateDoc(state.documents, docIndex, { totalPages: n }),
+          documents: updateDocById(state.documents, docId, { totalPages: n }),
         })),
 
       setDocCurrentPage: (page) =>
@@ -230,30 +234,30 @@ export const useAppStore = create<AppState>()(
           documents: updateDoc(state.documents, state.currentDocIndex, { currentPage: page }),
         })),
 
-      setDocPageData: (docIndex, page) =>
+      setDocPageData: (docId, page) =>
         set((state) => {
-          const doc = state.documents[docIndex]
+          const doc = state.documents.find((d) => d.id === docId)
           if (!doc) return {}
           const pages = [...doc.pages]
           pages[page.index] = page
           return {
-            documents: updateDoc(state.documents, docIndex, { pages }),
+            documents: updateDocById(state.documents, docId, { pages }),
           }
         }),
 
-      setDocLoading: (docIndex, loading) =>
+      setDocLoading: (docId, loading) =>
         set((state) => ({
-          documents: updateDoc(state.documents, docIndex, { isLoading: loading }),
+          documents: updateDocById(state.documents, docId, { isLoading: loading }),
         })),
 
-      setDocLoadingProgress: (docIndex, progress) =>
+      setDocLoadingProgress: (docId, progress) =>
         set((state) => ({
-          documents: updateDoc(state.documents, docIndex, { loadingProgress: progress }),
+          documents: updateDocById(state.documents, docId, { loadingProgress: progress }),
         })),
 
-      setDocProcessing: (docIndex, processing) =>
+      setDocProcessing: (docId, processing) =>
         set((state) => ({
-          documents: updateDoc(state.documents, docIndex, { isProcessing: processing }),
+          documents: updateDocById(state.documents, docId, { isProcessing: processing }),
         })),
 
       reset: () =>
