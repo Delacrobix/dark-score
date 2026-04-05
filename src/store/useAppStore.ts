@@ -93,7 +93,7 @@ export const useAppStore = create<AppState>()(
       documents: [],
       currentDocIndex: 0,
 
-      exportDpi: 200,
+      exportDpi: 300,
       exportMode: 'separate',
       zoomPercent: 100,
 

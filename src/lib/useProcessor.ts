@@ -69,7 +69,7 @@ async function loadDocumentSource(
 export function useProcessor() {
   const workerRef = useRef<Worker | null>(null)
   const pendingRef = useRef<Map<number, (data: ImageData) => void>>(new Map())
-  const loadedDocIdsRef = useRef<Set<string>>(new Set())
+  const loadedDocIdsRef = useRef<Map<string, number>>(new Map())
 
   const {
     documents,
@@ -126,9 +126,9 @@ export function useProcessor() {
 
     for (let i = 0; i < documents.length; i++) {
       const doc = documents[i]
-      if (loadedDocIdsRef.current.has(doc.id)) continue
+      if (loadedDocIdsRef.current.get(doc.id) === exportDpi) continue
 
-      loadedDocIdsRef.current.add(doc.id)
+      loadedDocIdsRef.current.set(doc.id, exportDpi)
       const signal = { cancelled: false }
       signals.push(signal)
       const docId = doc.id
@@ -158,7 +158,7 @@ export function useProcessor() {
 
     // Clean up removed doc IDs
     const currentIds = new Set(documents.map((d) => d.id))
-    for (const id of loadedDocIdsRef.current) {
+    for (const [id] of loadedDocIdsRef.current) {
       if (!currentIds.has(id)) loadedDocIdsRef.current.delete(id)
     }
 
