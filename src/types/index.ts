@@ -26,6 +26,8 @@ export interface Preset {
   defaults: PresetDefaults
 }
 
+export type ThresholdMode = 'hard' | 'soft'
+
 export interface ProcessingSettings {
   presetId: PresetId
   bgColor: string
@@ -33,6 +35,7 @@ export interface ProcessingSettings {
   contrast: number    // 0–200
   brightness: number  // 0–200
   threshold: number   // 0–255
+  thresholdMode: ThresholdMode
   dilation: number    // 0–3
 }
 
@@ -108,7 +111,7 @@ export const PRESETS: Preset[] = [
     description: 'Cream / amber',
     bgColor: '#1c1410',
     fgColor: '#f5e6c8',
-    defaults: { contrast: 100, brightness: 90, threshold: 120, dilation: 1 },
+    defaults: { contrast: 100, brightness: 90, threshold: 120, dilation: 0 },
   },
   {
     // Classical scores are dense with fine notation — high threshold to clean old prints,
@@ -122,23 +125,23 @@ export const PRESETS: Preset[] = [
   },
   {
     // Jazz Real Book style — often handwritten or scanned PDFs with chord symbols.
-    // Lower threshold handles uneven ink from old photocopies; slight dilation helps thin lines.
+    // Lower threshold handles uneven ink from old photocopies
     id: 'jazz',
     name: 'Jazz',
     description: 'Real book style',
     bgColor: '#141414',
     fgColor: '#e8e0d0',
-    defaults: { contrast: 105, brightness: 92, threshold: 115, dilation: 1 },
+    defaults: { contrast: 105, brightness: 92, threshold: 115, dilation: 0 },
   },
   {
-    // Pop/Rock lead sheets are simple with larger notation — slight dilation for bolder look,
+    // Pop/Rock lead sheets are simple with larger notation —
     // warmer tone for a relaxed reading feel
     id: 'pop',
     name: 'Pop / Rock',
     description: 'Lead sheets',
     bgColor: '#111318',
     fgColor: '#dde3f0',
-    defaults: { contrast: 100, brightness: 100, threshold: 130, dilation: 1 },
+    defaults: { contrast: 100, brightness: 100, threshold: 130, dilation: 0 },
   },
   {
     // Very warm amber — filters blue light for late-night practice sessions
@@ -165,5 +168,6 @@ export const DEFAULT_SETTINGS: ProcessingSettings = {
   presetId: 'stage',
   bgColor: DEFAULT_PRESET.bgColor,
   fgColor: DEFAULT_PRESET.fgColor,
+  thresholdMode: 'soft',
   ...DEFAULT_PRESET.defaults,
 }

@@ -6,7 +6,7 @@ import { HistoryPanel } from './HistoryPanel'
 
 export function ControlsPanel() {
   const { t } = useTranslation()
-  const { documents, currentDocIndex, applyPreset, updateSettingsLive, commitToHistory, resetSlider, applySettingsToAll } = useAppStore()
+  const { documents, currentDocIndex, applyPreset, updateSettings, updateSettingsLive, commitToHistory, resetSlider, applySettingsToAll } = useAppStore()
   const currentDoc = documents[currentDocIndex]
   const settings = currentDoc?.settings ?? DEFAULT_SETTINGS
   const showApplyAll = documents.length > 1
@@ -89,15 +89,32 @@ export function ControlsPanel() {
             onReset={() => resetSlider('brightness')}
             format={(v) => `${v}%`}
           />
-          <Slider
-            label={t('controls.threshold')}
-            value={settings.threshold}
-            min={0} max={255}
-            onChange={(v) => updateSettingsLive({ threshold: v })}
-            onCommit={commitToHistory}
-            onReset={() => resetSlider('threshold')}
-            format={String}
-          />
+          <div>
+            <Slider
+              label={t('controls.threshold')}
+              value={settings.threshold}
+              min={0} max={255}
+              onChange={(v) => updateSettingsLive({ threshold: v })}
+              onCommit={commitToHistory}
+              onReset={() => resetSlider('threshold')}
+              format={String}
+            />
+            <div className="flex items-center gap-1 mt-1.5">
+              {(['soft', 'hard'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => { updateSettings({ thresholdMode: mode }); trackEvent('settings', 'threshold_mode', mode) }}
+                  className={`flex-1 py-1 text-[10px] rounded transition-colors cursor-pointer
+                    ${settings.thresholdMode === mode
+                      ? 'bg-zinc-700 text-white'
+                      : 'text-zinc-600 hover:text-zinc-400'
+                    }`}
+                >
+                  {t(`controls.thresholdMode.${mode}`)}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <Slider
               label={t('controls.dilation')}

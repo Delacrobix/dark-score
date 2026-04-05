@@ -46,6 +46,10 @@
     "contrast": "Contraste",
     "brightness": "Brillo",
     "threshold": "Limpieza de escaneo",
+    "thresholdMode": {
+      "soft": "Suave",
+      "hard": "Nítido"
+    },
     "dilation": "Engrosamiento de líneas",
     "dilationWarning": "Nivel alto: las notas en pasajes densos pueden empastarse.",
     "reset": "Restablecer",

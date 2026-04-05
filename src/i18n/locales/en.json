@@ -46,6 +46,10 @@
     "contrast": "Contrast",
     "brightness": "Brightness",
     "threshold": "Scan cleaning",
+    "thresholdMode": {
+      "soft": "Smooth",
+      "hard": "Sharp"
+    },
     "dilation": "Line thickening",
     "dilationWarning": "High level: notes in dense passages may bleed together.",
     "reset": "Reset",
