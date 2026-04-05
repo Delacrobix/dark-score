@@ -10,7 +10,8 @@ const DPI_OPTIONS = [200, 300] as const
 
 export function ExportButton() {
   const { t } = useTranslation()
-  const { documents, exportDpi, exportMode, setExportDpi, setExportMode } = useAppStore()
+  const { documents, currentDocIndex, exportDpi, exportMode, setExportDpi, setExportMode } = useAppStore()
+  const currentDoc = documents[currentDocIndex] ?? null
   const hasPdf = documents.some((d) => d.source.type === 'pdf')
   const [format, setFormat] = useState<ExportFormat>('pdf')
   const [exporting, setExporting] = useState(false)
@@ -26,24 +27,16 @@ export function ExportButton() {
     const mode = multiDoc ? exportMode : 'single'
     trackEvent('export', 'export_file', `format:${format},mode:${mode},docs:${documents.length}`)
     try {
-      if (format === 'png') {
-        // PNG: always export each document separately
-        for (const doc of documents) {
-          const readyPages = doc.pages.filter((p) => p?.processedCanvas)
-          if (readyPages.length === 0) continue
-          await exportAsPng(readyPages, doc.label)
+      if (multiDoc && format === 'pdf' && exportMode === 'merged') {
+        await exportAsPdf(allPages, 'dark-score-batch.pdf')
+      } else if (currentDoc) {
+        const readyPages = currentDoc.pages.filter((p) => p?.processedCanvas)
+        if (readyPages.length === 0) return
+        if (format === 'pdf') {
+          await exportAsPdf(readyPages, `${currentDoc.label}.pdf`)
+        } else {
+          await exportAsPng(readyPages, currentDoc.label)
         }
-      } else if (multiDoc && exportMode === 'separate') {
-        // PDF separate: one PDF per document
-        for (const doc of documents) {
-          const readyPages = doc.pages.filter((p) => p?.processedCanvas)
-          if (readyPages.length === 0) continue
-          await exportAsPdf(readyPages, `${doc.label}.pdf`)
-        }
-      } else {
-        // PDF merged or single doc
-        const baseName = documents.length === 1 ? documents[0].label : 'dark-score-batch'
-        await exportAsPdf(allPages, `${baseName}.pdf`)
       }
     } finally {
       setExporting(false)
