@@ -60,7 +60,7 @@ export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void;
             onClick={onAbout}
             className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
           >
-            About
+            {t('header.about')}
           </button>
           <DonateButton />
           <LanguageSelector />
@@ -105,7 +105,7 @@ export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void;
               onClick={() => { onAbout(); setMenuOpen(false) }}
               className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer text-left"
             >
-              About
+              {t('header.about')}
             </button>
             <DonateButton />
             <LanguageSelector />

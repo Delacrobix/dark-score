@@ -3,6 +3,23 @@ import { useTranslation } from 'react-i18next'
 const KOFI_URL = 'https://ko-fi.com/R6R01X43VF'
 const KOFI_COLOR = '#FF5E5B'
 
+// Inline coffee-cup icon: avoids a third-party image request to ko-fi's CDN.
+function CupIcon({ size }: Readonly<{ size: number }>) {
+  return (
+    <svg
+      width={size} height={size} viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+      <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+      <line x1="6" y1="2" x2="6" y2="4" />
+      <line x1="10" y1="2" x2="10" y2="4" />
+      <line x1="14" y1="2" x2="14" y2="4" />
+    </svg>
+  )
+}
+
 export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtle' | 'prominent' }>) {
   const { t } = useTranslation()
 
@@ -15,7 +32,7 @@ export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtl
         className="inline-flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-white font-semibold transition-opacity hover:opacity-80"
         style={{ backgroundColor: KOFI_COLOR }}
       >
-        <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="" height="16" width="16" className="h-4 w-4" />
+        <CupIcon size={16} />
         {t('donate.label')}
       </a>
     )
@@ -29,7 +46,7 @@ export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtl
       className="text-xs transition-colors flex items-center gap-1 hover:opacity-80"
       style={{ color: KOFI_COLOR }}
     >
-      <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="" height="12" width="12" className="h-3 w-3" />
+      <CupIcon size={12} />
       {t('donate.label')}
     </a>
   )

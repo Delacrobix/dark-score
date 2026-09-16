@@ -1,7 +1,12 @@
-import * as pdfjsLib from 'pdfjs-dist'
-import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc
+// pdf.js is loaded on demand so the landing page never pays for it.
+async function getPdfjs() {
+  const [pdfjsLib, { default: workerSrc }] = await Promise.all([
+    import('pdfjs-dist'),
+    import('pdfjs-dist/build/pdf.worker.min.mjs?url'),
+  ])
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc
+  return pdfjsLib
+}
 
 export type RenderDpi = 200 | 300
 
@@ -12,7 +17,7 @@ export interface PdfRenderResult {
 
 export async function loadPdf(file: File, dpi: RenderDpi = 200): Promise<PdfRenderResult> {
   const scale = dpi / 72
-  const arrayBuffer = await file.arrayBuffer()
+  const [pdfjsLib, arrayBuffer] = await Promise.all([getPdfjs(), file.arrayBuffer()])
   const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise
 
   const renderPage = async (pageIndex: number): Promise<ImageData> => {

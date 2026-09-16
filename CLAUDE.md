@@ -3,8 +3,7 @@
 ## Stack
 
 - **React 19 + TypeScript + Vite** — framework y build tool
-- **Tailwind CSS v4** — estilos (con plugin `@tailwindcss/vite`, sin `tailwind.config.js`)
-- **HeroUI v3** (`@heroui/react` + `@heroui/styles`) — librería de componentes UI
+- **Tailwind CSS v4** — estilos (con plugin `@tailwindcss/vite`, sin `tailwind.config.js`). Sin librería de componentes: todo es Tailwind + HTML.
 - **Zustand** — estado global (presets, ajustes de imagen, página actual, modo)
 - **pdf.js** (`pdfjs-dist`) — renderizado de PDFs a Canvas
 - **jspdf** — generación de PDFs de salida
@@ -28,13 +27,9 @@ src/
 └── types/        # TypeScript types compartidos
 ```
 
-## Configuración CSS
+## Rendimiento
 
-El orden de imports en `index.css` importa:
-```css
-@import "tailwindcss";
-@import "@heroui/styles";
-```
+- `AppShell` y `AboutPage` se cargan con `React.lazy`; `pdfjs-dist`, `jspdf` y `jszip` se importan dinámicamente solo cuando se usan. No añadir imports estáticos de estas librerías fuera de `src/lib/`.
 
 ## Licencia
 

@@ -13,6 +13,7 @@
   "header": {
     "local": "Local processing",
     "localTooltip": "Your files are processed entirely in your browser. Nothing is uploaded to any server.",
+    "about": "About",
     "newScore": "← New score"
   },
   "steps": {
@@ -123,6 +124,7 @@
       ],
       "why": "I built it this way because I understand that sheet music can be copyrighted material, personal arrangements, or unpublished compositions. Your work deserves to stay yours."
     },
+    "viewSource": "View source code on GitHub",
     "backToHome": "Back to home"
   }
 }

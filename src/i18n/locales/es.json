@@ -13,6 +13,7 @@
   "header": {
     "local": "Procesamiento local",
     "localTooltip": "Tus archivos se procesan completamente en tu navegador. Nada se sube a ningún servidor.",
+    "about": "Acerca de",
     "newScore": "← Nueva partitura"
   },
   "steps": {
@@ -123,6 +124,7 @@
       ],
       "why": "Lo construi asi porque entiendo que las partituras pueden ser material con derechos de autor, arreglos personales o composiciones ineditas. Tu trabajo merece seguir siendo tuyo."
     },
+    "viewSource": "Ver código fuente en GitHub",
     "backToHome": "Volver al inicio"
   }
 }

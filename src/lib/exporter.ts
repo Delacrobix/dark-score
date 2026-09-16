@@ -1,6 +1,6 @@
-import { jsPDF } from 'jspdf'
-import JSZip from 'jszip'
 import type { PageData } from '../types'
+
+// jspdf and jszip are loaded on demand, only when the user exports.
 
 export type ExportFormat = 'pdf' | 'png'
 
@@ -25,6 +25,7 @@ export async function exportAsPdf(pages: PageData[], filename = 'dark-score.pdf'
   const firstPage = pages.find((p) => p.processedCanvas)
   if (!firstPage?.processedCanvas) return
 
+  const { jsPDF } = await import('jspdf')
   const { width, height } = firstPage.processedCanvas
   const orientation = width > height ? 'l' : 'p'
 
@@ -62,6 +63,7 @@ export async function exportAsPng(pages: PageData[], baseName = 'dark-score') {
   }
 
   // Multiple pages → ZIP
+  const { default: JSZip } = await import('jszip')
   const zip = new JSZip()
   for (const page of ready) {
     const blob = await canvasToBlob(page.processedCanvas!)
