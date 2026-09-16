@@ -13,7 +13,14 @@ function getSourceType(file: File): SourceType | null {
   return null
 }
 
-export function UploadZone() {
+interface UploadZoneProps {
+  /** Shorter drop area, for embedding in the landing page. */
+  compact?: boolean
+  /** Called after files were accepted and added to the store. */
+  onFilesAdded?: () => void
+}
+
+export function UploadZone({ compact = false, onFilesAdded }: Readonly<UploadZoneProps> = {}) {
   const { t } = useTranslation()
   const addDocuments = useAppStore((s) => s.addDocuments)
   const [isDragging, setIsDragging] = useState(false)
@@ -43,9 +50,10 @@ export function UploadZone() {
         const pdfCount = entries.filter((e) => e.type === 'pdf').length
         const imageCount = entries.filter((e) => e.type === 'image').length
         trackEvent('upload', 'upload_files', `pdf:${pdfCount},image:${imageCount}`)
+        onFilesAdded?.()
       }
     },
-    [addDocuments, t]
+    [addDocuments, onFilesAdded, t]
   )
 
   const onDrop = useCallback(
@@ -75,7 +83,7 @@ export function UploadZone() {
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         className={`
-          w-full h-72 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3
+          w-full ${compact ? 'h-44' : 'h-72'} rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-3
           cursor-pointer transition-colors duration-150 outline-none
           focus-visible:ring-2 focus-visible:ring-purple-400
           ${isDragging ? 'border-purple-400 bg-purple-400/5' : 'border-zinc-700 hover:border-zinc-500'}

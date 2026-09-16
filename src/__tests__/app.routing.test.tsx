@@ -48,8 +48,9 @@ describe('App routing', () => {
     expect(container.textContent).toContain('Convierte tus partituras a modo oscuro')
     expect(document.title).toBe(i18n.getFixedT('es')('seo.home.title'))
     expect(document.documentElement.lang).toBe('es')
-    const cta = container.querySelector('a[href="/es/app"]')
-    expect(cta?.textContent).toBe('Empezar')
+    const appLinks = Array.from(container.querySelectorAll('a[href="/es/app"]')).map((a) => a.textContent)
+    expect(appLinks).toContain('Abrir la app')
+    expect(appLinks).toContain('Empezar')
     expect(container.querySelector('a[href="/es/about"]')).not.toBeNull()
   })
 

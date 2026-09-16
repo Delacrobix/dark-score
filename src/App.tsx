@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Route, Switch, Redirect, useRouter } from 'wouter'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { LandingHero } from './components/LandingHero'
+import { LandingPage } from './components/LandingPage'
 import { AboutPage } from './components/AboutPage'
 import { RouteEffects } from './components/RouteEffects'
 import { ROUTES } from './lib/routes'
@@ -20,7 +20,7 @@ function HomeRedirect() {
 function Pages() {
   return (
     <Switch>
-      <Route path={ROUTES.home} component={LandingHero} />
+      <Route path={ROUTES.home} component={LandingPage} />
       <Route path={ROUTES.app} component={AppShell} />
       <Route path={ROUTES.about} component={AboutPage} />
       <Route>

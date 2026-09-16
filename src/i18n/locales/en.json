@@ -3,6 +3,31 @@
     "tagline": "Convert your sheet music to dark mode",
     "description": "Reading sheet music on screen at night, or on a dark stage, with the traditional white background is exhausting for your eyes. Dark Score intelligently inverts the colors of your PDFs and images: it removes scan noise, thickens staff lines, and applies the color scheme you prefer.",
     "cta": "Get started",
+    "eyebrow": "Free · No sign-up · Runs in your browser",
+    "sample": "Try with a sample score",
+    "sampleHint": "No file at hand?",
+    "demo": {
+      "before": "Original",
+      "after": "Dark stage",
+      "label": "Drag to compare the original and the dark mode result"
+    },
+    "how": {
+      "title": "How it works",
+      "upload": "Drop a PDF, PNG or JPG. Multi-page PDFs and several files at once are supported.",
+      "adjust": "Pick a preset for your situation, then fine-tune contrast, scan cleaning and line thickness with a live preview.",
+      "download": "Export a PDF or PNGs with the dark colors baked in. They open in any reader: forScore, GoodReader, tablets, laptops."
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        { "q": "Is Dark Score free?", "a": "Yes. It is free and open source (MIT), with no account and no limits. If it helps you, you can support it on Ko-fi." },
+        { "q": "Are my scores uploaded anywhere?", "a": "No. Your files are processed inside your browser using Web Workers. Nothing is sent to a server, and the app keeps working offline once loaded." },
+        { "q": "Which files can I convert?", "a": "PDF (including multi-page), PNG and JPG, up to 50 MB each. You can drop several files at once and export them merged or separately." },
+        { "q": "Does it work with scanned or photographed scores?", "a": "Yes. The scan cleaning control removes yellowed paper, shadows and noise, and line thickening restores staff lines that get lost when inverting." },
+        { "q": "Can I read the result in forScore, GoodReader or on a tablet?", "a": "Yes. The export is a regular PDF or PNG with the dark colors baked in, so it looks the same in any reader and on any device." },
+        { "q": "Why not just invert colors in my PDF reader?", "a": "A plain inversion turns scan noise into white blotches, thins the lines and gives a grey, muddy result. Dark Score cleans the page, thickens lines and maps the colors to palettes designed for reading in the dark." }
+      ]
+    },
     "privacy": {
       "badge": "Your scores never leave your device",
       "body": "We understand your scores are important to you. That is why this site never copies or sends your files to any external server. All processing happens directly in your browser, with no external connections.",
@@ -11,6 +36,7 @@
     }
   },
   "header": {
+    "openApp": "Open the app",
     "local": "Local processing",
     "localTooltip": "Your files are processed entirely in your browser. Nothing is uploaded to any server.",
     "about": "About",
@@ -63,6 +89,7 @@
     "current": "Current"
   },
   "footer": {
+    "source": "Source code",
     "bugReport": "Found a bug?"
   },
   "documents": {
