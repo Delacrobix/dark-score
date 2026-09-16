@@ -34,7 +34,8 @@ I built it this way because I understand that sheet music can be copyrighted mat
 - **Split view**: compare original vs. result side by side
 - **Zoom**: custom zoom level, Ctrl+scroll support
 - **DPI selector**: choose 200 or 300 DPI for PDF rendering
-- **i18n**: English and Spanish with auto language detection
+- **i18n**: English and Spanish, each with its own URLs (`/` and `/es`)
+- **Try it without a file**: an illustrated sample score is one click away
 - **PWA**: installable as a standalone app
 - **Settings history**: restore any previous adjustment
 
@@ -43,9 +44,11 @@ I built it this way because I understand that sheet music can be copyrighted mat
 - React 19 + TypeScript + Vite
 - Tailwind CSS v4
 - Zustand (state management)
+- wouter (routing) + build-time prerender to static HTML for SEO
 - pdf.js (PDF rendering)
 - Web Workers (image processing)
 - jsPDF + JSZip (export)
+- Umami (cookieless analytics) + Sentry (error reporting)
 
 ## Getting started
 
@@ -53,6 +56,16 @@ I built it this way because I understand that sheet music can be copyrighted mat
 npm install
 npm run dev
 ```
+
+## Analytics
+
+Usage statistics are collected with [Umami](https://umami.is): anonymous and cookieless, so no consent banner is needed. Set the website ID in `.env`:
+
+```
+VITE_UMAMI_WEBSITE_ID=your-website-id
+```
+
+Leave it empty to disable analytics (the default in development).
 
 ## Deploy to GitHub Pages
 

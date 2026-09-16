@@ -1,21 +1,44 @@
-import ReactGA from 'react-ga4'
+/**
+ * Privacy-friendly analytics with Umami (https://umami.is): cookieless,
+ * no personal data, no consent banner needed. Pageviews (including SPA
+ * navigations) are tracked automatically by the script; custom events go
+ * through trackEvent().
+ *
+ * The website ID comes from VITE_UMAMI_WEBSITE_ID (see .env). When it is
+ * empty nothing is loaded, so local development sends no data.
+ */
 
-const GA_MEASUREMENT_ID = 'G-2J3KWD2X2C'
+const UMAMI_WEBSITE_ID: string = import.meta.env.VITE_UMAMI_WEBSITE_ID ?? ''
+const UMAMI_SCRIPT_URL = 'https://cloud.umami.is/script.js'
+
+interface Umami {
+  track: (event: string, data?: Record<string, string | number>) => void
+}
+
+declare global {
+  interface Window {
+    umami?: Umami
+  }
+}
 
 export function initAnalytics() {
-  if (!GA_MEASUREMENT_ID) return
+  if (!UMAMI_WEBSITE_ID || !import.meta.env.PROD) return
+  if (document.querySelector(`script[src="${UMAMI_SCRIPT_URL}"]`)) return
 
-  ReactGA.initialize(GA_MEASUREMENT_ID)
+  const script = document.createElement('script')
+  script.defer = true
+  script.src = UMAMI_SCRIPT_URL
+  script.dataset.websiteId = UMAMI_WEBSITE_ID
+  document.head.appendChild(script)
 }
 
-export function trackPageView(page: string) {
-  if (!GA_MEASUREMENT_ID) return
-
-  ReactGA.send({ hitType: 'pageview', page })
-}
-
+/**
+ * Records a custom event. `action` is the event name shown in Umami;
+ * `category` and `label` are attached as event data.
+ */
 export function trackEvent(category: string, action: string, label?: string) {
-  if (!GA_MEASUREMENT_ID) return
-
-  ReactGA.event({ category, action, label })
+  if (!window.umami) return
+  const data: Record<string, string> = { category }
+  if (label) data.label = label
+  window.umami.track(action, data)
 }

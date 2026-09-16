@@ -21,7 +21,7 @@
       "title": "Frequently asked questions",
       "items": [
         { "q": "Is Dark Score free?", "a": "Yes. It is free and open source (MIT), with no account and no limits. If it helps you, you can support it on Ko-fi." },
-        { "q": "Are my scores uploaded anywhere?", "a": "No. Your files are processed inside your browser using Web Workers. Nothing is sent to a server, and the app keeps working offline once loaded." },
+        { "q": "Are my scores uploaded anywhere?", "a": "No. Your files are processed inside your browser using Web Workers and never reach a server. The app keeps working offline once loaded. We only collect anonymous, cookieless usage statistics (which pages are visited, which presets are used) and crash reports." },
         { "q": "Which files can I convert?", "a": "PDF (including multi-page), PNG and JPG, up to 50 MB each. You can drop several files at once and export them merged or separately." },
         { "q": "Does it work with scanned or photographed scores?", "a": "Yes. The scan cleaning control removes yellowed paper, shadows and noise, and line thickening restores staff lines that get lost when inverting." },
         { "q": "Can I read the result in forScore, GoodReader or on a tablet?", "a": "Yes. The export is a regular PDF or PNG with the dark colors baked in, so it looks the same in any reader and on any device." },
@@ -30,7 +30,7 @@
     },
     "privacy": {
       "badge": "Your scores never leave your device",
-      "body": "We understand your scores are important to you. That is why this site never copies or sends your files to any external server. All processing happens directly in your browser, with no external connections.",
+      "body": "We understand your scores are important to you. That is why this site never copies or sends your files to any external server: all processing happens directly in your browser. The only things that leave your device are anonymous, cookieless usage statistics and crash reports, never your files or their contents.",
       "github": "View source code on GitHub",
       "learnMore": "Learn more →"
     }
@@ -147,6 +147,7 @@
         "Your files are never uploaded to any server",
         "No internet connection is needed after the page loads",
         "No one else can see or access your scores",
+        "Only anonymous, cookieless usage statistics and crash reports are collected",
         "The source code is open and auditable on GitHub"
       ],
       "why": "I built it this way because I understand that sheet music can be copyrighted material, personal arrangements, or unpublished compositions. Your work deserves to stay yours."

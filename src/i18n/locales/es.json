@@ -21,7 +21,7 @@
       "title": "Preguntas frecuentes",
       "items": [
         { "q": "¿Dark Score es gratis?", "a": "Sí. Es gratuito y de código abierto (MIT), sin cuenta ni límites. Si te sirve, puedes apoyar el proyecto en Ko-fi." },
-        { "q": "¿Mis partituras se suben a algún sitio?", "a": "No. Tus archivos se procesan dentro de tu navegador con Web Workers. No se envía nada a ningún servidor, y la app sigue funcionando sin conexión una vez cargada." },
+        { "q": "¿Mis partituras se suben a algún sitio?", "a": "No. Tus archivos se procesan dentro de tu navegador con Web Workers y nunca llegan a un servidor. La app sigue funcionando sin conexión una vez cargada. Solo recogemos estadísticas de uso anónimas y sin cookies (qué páginas se visitan, qué modos se usan) y reportes de errores." },
         { "q": "¿Qué archivos puedo convertir?", "a": "PDF (también de varias páginas), PNG y JPG, de hasta 50 MB cada uno. Puedes soltar varios archivos a la vez y exportarlos unidos o por separado." },
         { "q": "¿Funciona con partituras escaneadas o fotografiadas?", "a": "Sí. El control de limpieza del escaneo elimina el papel amarillento, las sombras y el ruido, y el engrosado de líneas recupera los pentagramas que se pierden al invertir." },
         { "q": "¿Puedo leer el resultado en forScore, GoodReader o en una tablet?", "a": "Sí. La exportación es un PDF o PNG normal con los colores oscuros ya aplicados, así que se ve igual en cualquier lector y dispositivo." },
@@ -30,7 +30,7 @@
     },
     "privacy": {
       "badge": "Tus partituras nunca salen de tu dispositivo",
-      "body": "Entendemos que tus partituras son importantes para ti. Por ese motivo, esta web no copia ni envía tus archivos a ningún servidor externo. Todo el procesamiento ocurre directamente en tu navegador, sin conexiones externas.",
+      "body": "Entendemos que tus partituras son importantes para ti. Por ese motivo, esta web no copia ni envía tus archivos a ningún servidor externo: todo el procesamiento ocurre directamente en tu navegador. Lo único que sale de tu dispositivo son estadísticas de uso anónimas y sin cookies, y reportes de errores; nunca tus archivos ni su contenido.",
       "github": "Ver código fuente en GitHub",
       "learnMore": "Saber mas →"
     }
@@ -147,6 +147,7 @@
         "Tus archivos nunca se suben a ningun servidor",
         "No se necesita conexion a internet despues de cargar la pagina",
         "Nadie mas puede ver ni acceder a tus partituras",
+        "Solo se recogen estadísticas de uso anónimas y sin cookies, y reportes de errores",
         "El codigo fuente es abierto y auditable en GitHub"
       ],
       "why": "Lo construi asi porque entiendo que las partituras pueden ser material con derechos de autor, arreglos personales o composiciones ineditas. Tu trabajo merece seguir siendo tuyo."
