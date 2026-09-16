@@ -126,5 +126,19 @@
     },
     "viewSource": "Ver código fuente en GitHub",
     "backToHome": "Volver al inicio"
+  },
+  "seo": {
+    "home": {
+      "title": "Dark Score | Convierte partituras a modo oscuro - Gratis y online",
+      "description": "Convierte tus partituras en PDF o imagen a modo oscuro gratis. Invierte los colores, limpia el ruido del escaneo y engrosa las líneas del pentagrama. 100% privado: tus archivos nunca salen de tu navegador."
+    },
+    "about": {
+      "title": "Acerca de Dark Score | Partituras en modo oscuro para músicos",
+      "description": "Para quién es Dark Score: estudio nocturno, escenarios oscuros, fosos de orquesta y docentes. Todo ocurre en tu navegador: tus partituras nunca salen de tu dispositivo."
+    },
+    "app": {
+      "title": "Dark Score | Editor",
+      "description": "Sube una partitura, elige un modo, ajústala y descárgala en modo oscuro."
+    }
   }
 }

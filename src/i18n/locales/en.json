@@ -126,5 +126,19 @@
     },
     "viewSource": "View source code on GitHub",
     "backToHome": "Back to home"
+  },
+  "seo": {
+    "home": {
+      "title": "Dark Score | Convert Sheet Music to Dark Mode - Free Online Tool",
+      "description": "Convert your sheet music PDFs and images to dark mode for free. Invert colors, remove scan noise, thicken staff lines. 100% private: files never leave your browser."
+    },
+    "about": {
+      "title": "About Dark Score | Dark Mode Sheet Music for Musicians",
+      "description": "Who Dark Score is for: night practice, dark stages, orchestra pits and teachers. Everything runs in your browser, so your scores never leave your device."
+    },
+    "app": {
+      "title": "Dark Score | Editor",
+      "description": "Upload a score, pick a preset, adjust and download it in dark mode."
+    }
   }
 }

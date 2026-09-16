@@ -1,13 +1,10 @@
 import { useTranslation } from 'react-i18next'
+import { Link } from 'wouter'
 import { LanguageSelector } from './LanguageSelector'
 import { DonateButton } from './DonateButton'
+import { ROUTES } from '../lib/routes'
 
-interface LandingHeroProps {
-  onGetStarted: () => void
-  onAbout: () => void
-}
-
-export function LandingHero({ onGetStarted, onAbout }: Readonly<LandingHeroProps>) {
+export function LandingHero() {
   const { t } = useTranslation()
 
   return (
@@ -32,12 +29,12 @@ export function LandingHero({ onGetStarted, onAbout }: Readonly<LandingHeroProps
       </p>
 
       <div className="flex items-center gap-4">
-        <button
-          onClick={onGetStarted}
+        <Link
+          href={ROUTES.app}
           className="bg-purple-500 hover:bg-purple-400 text-white font-semibold px-10 py-3 rounded-lg transition-colors cursor-pointer text-base"
         >
           {t('landing.cta')}
-        </button>
+        </Link>
         <DonateButton variant="prominent" />
       </div>
 
@@ -70,12 +67,12 @@ export function LandingHero({ onGetStarted, onAbout }: Readonly<LandingHeroProps
             </svg>
             {t('landing.privacy.github')}
           </a>
-          <button
-            onClick={onAbout}
+          <Link
+            href={ROUTES.about}
             className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
           >
             {t('landing.privacy.learnMore')}
-          </button>
+          </Link>
         </div>
       </div>
     </div>

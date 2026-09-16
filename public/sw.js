@@ -1,7 +1,8 @@
-const CACHE_NAME = 'dark-score-v1'
+const CACHE_NAME = 'dark-score-v2'
 
 const PRECACHE = [
   '/',
+  '/es',
   '/favicon.svg',
   '/manifest.json',
 ]

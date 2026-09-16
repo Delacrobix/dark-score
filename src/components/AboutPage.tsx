@@ -1,10 +1,8 @@
 import { useTranslation } from 'react-i18next'
+import { Link } from 'wouter'
 import { LanguageSelector } from './LanguageSelector'
 import { DonateButton } from './DonateButton'
-
-interface AboutPageProps {
-  onBack: () => void
-}
+import { ROUTES } from '../lib/routes'
 
 const USE_CASES = ['nightOwls', 'stagePerformers', 'orchestraPit', 'teachers', 'custom'] as const
 
@@ -16,7 +14,7 @@ const USE_CASE_ICONS: Record<string, string> = {
   custom: '🎨',
 }
 
-export function AboutPage({ onBack }: Readonly<AboutPageProps>) {
+export function AboutPage() {
   const { t } = useTranslation()
 
   const privacyPoints = t('about.privacy.points', { returnObjects: true }) as string[]
@@ -25,13 +23,13 @@ export function AboutPage({ onBack }: Readonly<AboutPageProps>) {
     <div className="min-h-screen bg-zinc-950 text-white">
       {/* Header */}
       <header className="border-b border-zinc-800 px-6 py-4 flex items-center gap-3">
-        <button
-          onClick={onBack}
+        <Link
+          href={ROUTES.home}
           className="flex items-center gap-2 cursor-pointer hover:opacity-75 transition-opacity"
         >
           <span className="text-2xl select-none">𝄞</span>
           <span className="font-semibold tracking-tight">Dark Score</span>
-        </button>
+        </Link>
         <div className="ml-auto flex items-center gap-4">
           <DonateButton />
           <LanguageSelector />
@@ -99,12 +97,12 @@ export function AboutPage({ onBack }: Readonly<AboutPageProps>) {
         </section>
 
         {/* Back */}
-        <button
-          onClick={onBack}
+        <Link
+          href={ROUTES.home}
           className="text-sm text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
         >
           ← {t('about.backToHome')}
-        </button>
+        </Link>
       </main>
     </div>
   )

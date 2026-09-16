@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link, useLocation } from 'wouter'
 import { useAppStore } from '../store/useAppStore'
+import { ROUTES } from '../lib/routes'
 import { useProcessor } from '../lib/useProcessor'
 import { UploadZone } from './UploadZone'
 import { PreviewCanvas } from './PreviewCanvas'
@@ -11,8 +13,9 @@ import { LanguageSelector } from './LanguageSelector'
 import { DonateButton } from './DonateButton'
 import { DocumentTabs } from './DocumentTabs'
 
-export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void; onAbout: () => void }>) {
+export function AppShell() {
   const { t } = useTranslation()
+  const [, navigate] = useLocation()
   const [comparing, setComparing] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   useProcessor()
@@ -27,7 +30,7 @@ export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void;
 
   const handleGoHome = () => {
     reset()
-    onGoHome()
+    navigate(ROUTES.home)
   }
 
   return (
@@ -56,12 +59,12 @@ export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void;
         </div>
 
         <div className="hidden md:flex ml-auto items-center gap-4">
-          <button
-            onClick={onAbout}
+          <Link
+            href={ROUTES.about}
             className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors cursor-pointer"
           >
             {t('header.about')}
-          </button>
+          </Link>
           <DonateButton />
           <LanguageSelector />
           <span className="text-xs text-zinc-700 flex items-center gap-1.5 relative group">
@@ -101,12 +104,13 @@ export function AppShell({ onGoHome, onAbout }: Readonly<{ onGoHome: () => void;
                 {t('header.newScore')}
               </button>
             )}
-            <button
-              onClick={() => { onAbout(); setMenuOpen(false) }}
+            <Link
+              href={ROUTES.about}
+              onClick={() => setMenuOpen(false)}
               className="text-xs text-zinc-400 hover:text-white transition-colors cursor-pointer text-left"
             >
               {t('header.about')}
-            </button>
+            </Link>
             <DonateButton />
             <LanguageSelector />
             <span className="text-xs text-zinc-500 flex items-center gap-1.5">
