@@ -23,3 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 .agents/
+test_scores
+
+# Playwright
+e2e/.generated
+e2e/.review
+test-results
+playwright-report

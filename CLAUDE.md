@@ -38,6 +38,11 @@ scripts/prerender.mjs # genera el HTML estático tras el build
 
 - `AppShell` y `AboutPage` se cargan con `React.lazy`; `pdfjs-dist`, `jspdf` y `jszip` se importan dinámicamente solo cuando se usan. No añadir imports estáticos de estas librerías fuera de `src/lib/`.
 
+## Tests
+
+- `npm test` — vitest (unitarios + smoke de rutas en jsdom).
+- `npm run test:e2e` — Playwright contra el build de producción (`vite preview`), con el Chrome instalado (`channel: 'chrome'`, sin descargar navegadores). Cada test lleva el ID de una fila de `docs/comportamientos-esperados.md`; `npm run test:e2e:coverage` comprueba que documento y tests están sincronizados. Fallos conocidos se marcan con `test.fail()` y ❌ en el documento. Partituras reales en `test_scores/` (fuera de git); capturas para revisión visual en `e2e/.review/`.
+
 ## Licencia
 
 MIT — proyecto open source.
