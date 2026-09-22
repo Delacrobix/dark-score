@@ -1,31 +1,24 @@
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
-import type { SourceType, SourceEntry } from '../types'
-
-const ACCEPTED_EXT = ['.pdf', '.png', '.jpg', '.jpeg']
-
-function getSourceType(file: File): SourceType | null {
-  if (file.type === 'application/pdf') return 'pdf'
-  if (file.type.startsWith('image/')) return 'image'
-  return null
-}
+import { trackEvent } from '../lib/analytics'
+import { ACCEPTED_EXT, intakeFiles, intakeLabel } from '../lib/fileIntake'
 
 export function DocumentTabs() {
   const { t } = useTranslation()
   const { documents, currentDocIndex, setCurrentDocIndex, removeDocument, addDocuments } = useAppStore()
+  const setRejectedFiles = useAppStore((s) => s.setRejectedFiles)
   const inputRef = useRef<HTMLInputElement>(null)
 
   if (documents.length === 0) return null
 
   const handleAddFiles = (fileList: FileList) => {
-    const entries: SourceEntry[] = []
-    for (const file of Array.from(fileList)) {
-      const type = getSourceType(file)
-      if (!type) continue
-      entries.push({ file, type })
+    const { entries, rejected } = intakeFiles(Array.from(fileList))
+    setRejectedFiles(rejected)
+    if (entries.length > 0) {
+      addDocuments(entries, true)
+      trackEvent('upload', 'upload_files', intakeLabel(entries))
     }
-    if (entries.length > 0) addDocuments(entries, true)
   }
 
   return (
@@ -47,6 +40,11 @@ export function DocumentTabs() {
           {doc.isLoading && (
             <span className="text-[10px] text-zinc-600">
               {Math.round(doc.loadingProgress * 100)}%
+            </span>
+          )}
+          {doc.error && (
+            <span className="text-[10px] text-red-400" title={t(`errors.${doc.error === 'password-protected' ? 'passwordProtected' : 'loadFailed'}`)}>
+              !
             </span>
           )}
           <button

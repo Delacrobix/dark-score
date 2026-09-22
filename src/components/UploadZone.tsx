@@ -2,16 +2,8 @@ import { useRef, useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { trackEvent } from '../lib/analytics'
-import type { SourceType, SourceEntry } from '../types'
-
-const ACCEPTED_EXT = ['.pdf', '.png', '.jpg', '.jpeg']
-const MAX_SIZE_MB = 50
-
-function getSourceType(file: File): SourceType | null {
-  if (file.type === 'application/pdf') return 'pdf'
-  if (file.type.startsWith('image/')) return 'image'
-  return null
-}
+import { ACCEPTED_EXT, MAX_SIZE_MB, intakeFiles, intakeLabel } from '../lib/fileIntake'
+import { UploadErrors } from './UploadErrors'
 
 interface UploadZoneProps {
   /** Shorter drop area, for embedding in the landing page. */
@@ -23,37 +15,22 @@ interface UploadZoneProps {
 export function UploadZone({ compact = false, onFilesAdded }: Readonly<UploadZoneProps> = {}) {
   const { t } = useTranslation()
   const addDocuments = useAppStore((s) => s.addDocuments)
+  const setRejectedFiles = useAppStore((s) => s.setRejectedFiles)
   const [isDragging, setIsDragging] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleFiles = useCallback(
     (fileList: FileList) => {
-      setError(null)
-      const entries: SourceEntry[] = []
-
-      for (const file of Array.from(fileList)) {
-        const type = getSourceType(file)
-        if (!type) {
-          setError(t('upload.errorFormat'))
-          return
-        }
-        if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-          setError(t('upload.errorSize', { size: MAX_SIZE_MB }))
-          return
-        }
-        entries.push({ file, type })
-      }
+      const { entries, rejected } = intakeFiles(Array.from(fileList))
+      setRejectedFiles(rejected)
 
       if (entries.length > 0) {
         addDocuments(entries)
-        const pdfCount = entries.filter((e) => e.type === 'pdf').length
-        const imageCount = entries.filter((e) => e.type === 'image').length
-        trackEvent('upload', 'upload_files', `pdf:${pdfCount},image:${imageCount}`)
+        trackEvent('upload', 'upload_files', intakeLabel(entries))
         onFilesAdded?.()
       }
     },
-    [addDocuments, onFilesAdded, t]
+    [addDocuments, setRejectedFiles, onFilesAdded]
   )
 
   const onDrop = useCallback(
@@ -109,7 +86,7 @@ export function UploadZone({ compact = false, onFilesAdded }: Readonly<UploadZon
         </div>
       </button>
 
-      {error && <p className="text-xs text-red-400 text-center">{error}</p>}
+      <div className="text-center"><UploadErrors /></div>
 
       <input
         ref={inputRef}

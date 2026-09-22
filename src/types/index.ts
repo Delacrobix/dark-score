@@ -45,6 +45,9 @@ export interface PageData {
   processedCanvas: HTMLCanvasElement | null
 }
 
+/** Why a document could not be opened. Stored as a code so it re-translates. */
+export type DocError = 'load-failed' | 'password-protected'
+
 export type SourceType = 'pdf' | 'image'
 
 export interface SourceEntry {
@@ -72,6 +75,8 @@ export interface DocumentEntry {
   isLoading: boolean
   loadingProgress: number
   isProcessing: boolean
+  /** Set when the file could not be read; the preview shows it instead of a canvas. */
+  error: DocError | null
 }
 
 export interface WorkerRequest {

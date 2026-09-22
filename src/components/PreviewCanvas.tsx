@@ -41,6 +41,21 @@ export function PreviewCanvas() {
     )
   }
 
+  if (currentDoc?.error) {
+    const key = currentDoc.error === 'password-protected' ? 'passwordProtected' : 'loadFailed'
+    return (
+      <div role="alert" className="flex flex-col items-center gap-3 text-center max-w-sm">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        <p className="text-sm text-red-400">{t(`errors.${key}`)}</p>
+        <p className="text-xs text-zinc-600">{currentDoc.label}</p>
+      </div>
+    )
+  }
+
   if (!processedCanvas) return null
 
   return (

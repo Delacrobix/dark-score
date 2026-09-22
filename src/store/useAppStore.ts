@@ -1,10 +1,12 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { Rejection } from '../lib/fileIntake'
 import {
   type ProcessingSettings,
   type PageData,
   type PresetId,
   type SliderKey,
+  type DocError,
   type DocumentEntry,
   type SourceEntry,
   type HistoryEntry,
@@ -40,6 +42,7 @@ function createDocument(source: SourceEntry, settings: ProcessingSettings): Docu
     isLoading: false,
     loadingProgress: 0,
     isProcessing: false,
+    error: null,
   }
 }
 
@@ -56,6 +59,8 @@ function updateDoc(docs: DocumentEntry[], index: number, patch: Partial<Document
 interface AppState {
   documents: DocumentEntry[]
   currentDocIndex: number
+  /** Files from the last selection that could not be accepted. */
+  rejectedFiles: Rejection[]
 
   exportDpi: 200 | 300
   exportMode: ExportMode
@@ -83,6 +88,8 @@ interface AppState {
   setDocLoading: (docId: string, loading: boolean) => void
   setDocLoadingProgress: (docId: string, progress: number) => void
   setDocProcessing: (docId: string, processing: boolean) => void
+  setDocError: (docId: string, error: DocError | null) => void
+  setRejectedFiles: (rejected: Rejection[]) => void
 
   reset: () => void
 }
@@ -92,6 +99,7 @@ export const useAppStore = create<AppState>()(
     (set) => ({
       documents: [],
       currentDocIndex: 0,
+      rejectedFiles: [],
 
       exportDpi: 300,
       exportMode: 'separate',
@@ -260,10 +268,18 @@ export const useAppStore = create<AppState>()(
           documents: updateDocById(state.documents, docId, { isProcessing: processing }),
         })),
 
+      setDocError: (docId, error) =>
+        set((state) => ({
+          documents: updateDocById(state.documents, docId, { error }),
+        })),
+
+      setRejectedFiles: (rejected) => set({ rejectedFiles: rejected }),
+
       reset: () =>
         set({
           documents: [],
           currentDocIndex: 0,
+          rejectedFiles: [],
         }),
     }),
     {

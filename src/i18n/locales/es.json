@@ -52,8 +52,12 @@
     "dragging": "Suelta aquí",
     "hint": "o haz clic para seleccionar · PDF, PNG, JPG · máx. {{size}} MB · varios archivos",
     "privacy": "Tus partituras nunca salen de tu dispositivo",
-    "errorFormat": "Formato no soportado. Usa PDF, PNG o JPG.",
-    "errorSize": "El archivo supera los {{size}} MB."
+    "rejectedFormat": "{{name}}: formato no soportado. Usa PDF, PNG o JPG.",
+    "rejectedSize": "{{name}}: supera los {{size}} MB."
+  },
+  "errors": {
+    "loadFailed": "No se pudo leer este archivo. Puede estar dañado o no ser realmente un PDF.",
+    "passwordProtected": "Este PDF está protegido con contraseña. Quita la contraseña e inténtalo de nuevo."
   },
   "presets": {
     "label": "Modo",

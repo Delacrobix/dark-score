@@ -52,8 +52,12 @@
     "dragging": "Drop here",
     "hint": "or click to select · PDF, PNG, JPG · max. {{size}} MB · multiple files supported",
     "privacy": "Your scores never leave your device",
-    "errorFormat": "Unsupported format. Please use PDF, PNG or JPG.",
-    "errorSize": "File exceeds {{size}} MB."
+    "rejectedFormat": "{{name}}: unsupported format. Use PDF, PNG or JPG.",
+    "rejectedSize": "{{name}}: over {{size}} MB."
+  },
+  "errors": {
+    "loadFailed": "This file could not be read. It may be damaged, or not really a PDF.",
+    "passwordProtected": "This PDF is password-protected. Remove the password and try again."
   },
   "presets": {
     "label": "Mode",
