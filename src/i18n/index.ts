@@ -11,11 +11,16 @@ i18n
     resources: { en: { translation: en }, es: { translation: es } },
     fallbackLng: 'en',
     supportedLngs: ['en', 'es'],
+    // Drop the region before matching: 'en-CO' is English, not "unsupported,
+    // try the next entry in navigator.languages" (which would land on 'es'
+    // for an English browser that also lists Spanish).
+    load: 'languageOnly',
     detection: {
-      // Check navigator language, then localStorage
-      order: ['localStorage', 'navigator'],
-      lookupLocalStorage: 'dark-score-lang',
-      caches: ['localStorage'],
+      // The browser language decides, every visit. Nothing is remembered:
+      // the URL prefix is what carries the language ('/es/...'), and caching
+      // would let one visit to a Spanish link pin Spanish forever.
+      order: ['navigator'],
+      caches: [],
     },
     interpolation: { escapeValue: false },
   })
