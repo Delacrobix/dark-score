@@ -1,9 +1,17 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { loadPdf, loadImage, type RenderDpi } from './pdfRenderer'
-import type { WorkerRequest, WorkerResponse, ProcessingSettings, PageData, SourceEntry } from '../types'
+import type { WorkerRequest, WorkerResponse, ProcessingSettings, PageData, SourceEntry, DocError } from '../types'
 
 let workerRequestId = 0
+
+/**
+ * A file the browser cannot read is the user's problem, not a crash: it is
+ * shown in the preview instead of bubbling up as an unhandled rejection.
+ */
+function classifyLoadError(err: unknown): DocError {
+  return (err as { name?: string } | null)?.name === 'PasswordException' ? 'password-protected' : 'load-failed'
+}
 
 type SendFn = (imageData: ImageData, settings: ProcessingSettings) => Promise<ImageData>
 
@@ -66,10 +74,17 @@ async function loadDocumentSource(
   }
 }
 
+interface DocLoad {
+  dpi: RenderDpi
+  cancelled: boolean
+}
+
 export function useProcessor() {
   const workerRef = useRef<Worker | null>(null)
   const pendingRef = useRef<Map<number, (data: ImageData) => void>>(new Map())
-  const loadedDocIdsRef = useRef<Map<string, number>>(new Map())
+  // One in-flight (or finished) load per document id. Kept per document so
+  // that adding, removing or re-rendering one document never cancels the others.
+  const loadsRef = useRef<Map<string, DocLoad>>(new Map())
 
   const {
     documents,
@@ -80,6 +95,7 @@ export function useProcessor() {
     setDocLoading,
     setDocLoadingProgress,
     setDocProcessing,
+    setDocError,
   } = useAppStore()
 
   const currentDoc = documents[currentDocIndex] ?? null
@@ -113,28 +129,33 @@ export function useProcessor() {
   )
 
   // Load new documents when they appear
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const docIdKey = documents.map((d) => d.id).join(',')
 
   useEffect(() => {
-    if (documents.length === 0) {
-      loadedDocIdsRef.current.clear()
-      return
+    const loads = loadsRef.current
+
+    // Cancel the loads of removed documents
+    const currentIds = new Set(documents.map((d) => d.id))
+    for (const [id, load] of loads) {
+      if (!currentIds.has(id)) {
+        load.cancelled = true
+        loads.delete(id)
+      }
     }
 
-    const signals: { cancelled: boolean }[] = []
+    for (const doc of documents) {
+      const previous = loads.get(doc.id)
+      if (previous?.dpi === exportDpi) continue
+      // DPI changed: restart from scratch at the new resolution
+      if (previous) previous.cancelled = true
 
-    for (let i = 0; i < documents.length; i++) {
-      const doc = documents[i]
-      if (loadedDocIdsRef.current.get(doc.id) === exportDpi) continue
-
-      loadedDocIdsRef.current.set(doc.id, exportDpi)
-      const signal = { cancelled: false }
-      signals.push(signal)
+      const load: DocLoad = { dpi: exportDpi, cancelled: false }
+      loads.set(doc.id, load)
       const docId = doc.id
 
       setDocLoading(docId, true)
       setDocLoadingProgress(docId, 0)
+      setDocError(docId, null)
 
       const run = async () => {
         try {
@@ -146,27 +167,30 @@ export function useProcessor() {
             (n) => setDocTotalPages(docId, n),
             (page) => setDocPageData(docId, page),
             (progress) => setDocLoadingProgress(docId, progress),
-            signal
+            load
           )
+        } catch (err) {
+          if (!load.cancelled) setDocError(docId, classifyLoadError(err))
         } finally {
-          if (!signal.cancelled) setDocLoading(docId, false)
+          if (!load.cancelled) setDocLoading(docId, false)
         }
       }
 
       run()
     }
-
-    // Clean up removed doc IDs
-    const currentIds = new Set(documents.map((d) => d.id))
-    for (const [id] of loadedDocIdsRef.current) {
-      if (!currentIds.has(id)) loadedDocIdsRef.current.delete(id)
-    }
-
-    return () => {
-      for (const s of signals) s.cancelled = true
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [docIdKey, exportDpi])
+
+  // On unmount, cancel every load and forget it, so that a remount starts
+  // again with the new worker. StrictMode does exactly that in development:
+  // mount, unmount, mount again, with the documents already in the store.
+  useEffect(() => {
+    const loads = loadsRef.current
+    return () => {
+      for (const load of loads.values()) load.cancelled = true
+      loads.clear()
+    }
+  }, [])
 
   // Re-process all pages of current doc when settings change
   const docSettings = currentDoc?.settings
