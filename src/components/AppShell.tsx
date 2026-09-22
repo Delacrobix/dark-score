@@ -12,6 +12,7 @@ import { ExportButton } from './ExportButton'
 import { LanguageSelector } from './LanguageSelector'
 import { DonateButton } from './DonateButton'
 import { DocumentTabs } from './DocumentTabs'
+import { UploadErrors } from './UploadErrors'
 
 export function AppShell() {
   const { t } = useTranslation()
@@ -125,6 +126,11 @@ export function AppShell() {
 
       {/* Document tabs */}
       <DocumentTabs />
+      {hasFile && (
+        <div className="px-4 md:px-6 pt-2">
+          <UploadErrors />
+        </div>
+      )}
 
       {/* Main */}
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
@@ -191,24 +197,31 @@ function ResizablePanel({ children }: Readonly<{ children: ReactNode }>) {
   const panelRef = useRef<HTMLDivElement>(null)
   const [width, setWidth] = useState(MIN_PANEL_WIDTH)
 
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
+  // Pointer events cover mouse, finger and pen in one path; capturing the
+  // pointer keeps the drag alive even when it leaves the handle.
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
     e.preventDefault()
+    const handle = e.currentTarget
+    handle.setPointerCapture(e.pointerId)
     const startX = e.clientX
     const startWidth = width
 
-    const onMouseMove = (ev: MouseEvent) => {
+    const onPointerMove = (ev: PointerEvent) => {
+      if (ev.pointerId !== e.pointerId) return
       const delta = startX - ev.clientX
       const maxWidth = window.innerWidth * MAX_PANEL_RATIO
       setWidth(Math.max(MIN_PANEL_WIDTH, Math.min(startWidth + delta, maxWidth)))
     }
 
-    const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove)
-      document.removeEventListener('mouseup', onMouseUp)
+    const onPointerUp = () => {
+      handle.removeEventListener('pointermove', onPointerMove)
+      handle.removeEventListener('pointerup', onPointerUp)
+      handle.removeEventListener('pointercancel', onPointerUp)
     }
 
-    document.addEventListener('mousemove', onMouseMove)
-    document.addEventListener('mouseup', onMouseUp)
+    handle.addEventListener('pointermove', onPointerMove)
+    handle.addEventListener('pointerup', onPointerUp)
+    handle.addEventListener('pointercancel', onPointerUp)
   }, [width])
 
   return (
@@ -220,8 +233,9 @@ function ResizablePanel({ children }: Readonly<{ children: ReactNode }>) {
       <button
         type="button"
         aria-label="Resize panel"
-        onMouseDown={onMouseDown}
-        className="hidden lg:flex absolute left-0 top-0 bottom-0 w-3 -ml-1.5 cursor-col-resize items-center justify-center border-0 bg-transparent p-0 group/handle"
+        onPointerDown={onPointerDown}
+        // touch-none: the browser must not read the drag as a scroll gesture
+        className="hidden lg:flex absolute left-0 top-0 bottom-0 w-3 -ml-1.5 cursor-col-resize touch-none items-center justify-center border-0 bg-transparent p-0 group/handle"
       >
         <span className="w-0.5 h-8 rounded-full bg-zinc-700 group-hover/handle:bg-purple-400 group-active/handle:bg-purple-500 transition-colors" />
       </button>
