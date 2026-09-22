@@ -1,0 +1,1 @@
+import{t as e}from"./esm-p137o5hy.js";var t=`https://0c93fff500c5afcea3c016b33c9a846a@o4511146528735232.ingest.us.sentry.io/4511146530373632`;function n(){e({dsn:t,environment:`production`,sendDefaultPii:!1})}export{n as initSentry};

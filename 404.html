@@ -1,19 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <script>
-      // SPA redirect for GitHub Pages
-      // Redirects 404s to index.html preserving the path
-      var pathSegmentsToKeep = 0;
-      var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
-    </script>
+    <meta name="robots" content="noindex" />
+    <title>Dark Score</title>
+    <!-- GitHub Pages fallback: every real page is prerendered as its own
+         index.html, so anything reaching here is an unknown path. -->
+    <script>window.location.replace('/')</script>
   </head>
+  <body></body>
 </html>
