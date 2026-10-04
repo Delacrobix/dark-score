@@ -46,7 +46,7 @@ test('RESP-02 on a phone the editor has a ☰ menu and the controls go below the
   await expect(menu).toBeVisible()
   await expect(page.getByRole('link', { name: 'About' })).toBeHidden()
   await menu.click()
-  await expect(page.getByRole('button', { name: '← New score' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /New score/ })).toBeVisible()
   await expect(page.getByRole('link', { name: 'About' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Support the project' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'ES', exact: true })).toBeVisible()
@@ -64,7 +64,7 @@ test('RESP-03 on a tablet the editor loads and processes a PDF and fits the scre
   await noHorizontalScroll(page)
   await expect(page.locator('main').getByText('1 / 2')).toBeVisible()
   await expect(presetButton(page, 'Dark stage')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Download' })).toBeEnabled()
+  await expect(page.getByRole('button', { name: /^Download/ })).toBeEnabled()
 })
 
 test('RESP-04 the Compare divider follows a finger drag', async ({ page }) => {

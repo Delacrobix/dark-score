@@ -5,6 +5,8 @@ Lo que Dark Score debe hacer, visto desde el usuario. Cada fila tiene un ID esta
 - **Verificación**: `auto` = test E2E en Playwright (`npm run test:e2e`), `unit` = vitest, `visual` = revisión humana de las capturas en `e2e/.review/`, `manual` = a mano en dispositivo real.
 - **Estado**: ✅ se cumple · ❌ no se cumple (el test lo documenta con `test.fail()`) · ⚠️ decisión pendiente de confirmar · — sin verificar.
 
+> **Variantes de diseño.** Las filas marcadas con 🎨 dependen de una opción de `src/design/options.ts` y describen la variante `chosen`, que es la que usa producción y la que prueban los tests (elección del 2026-10-04). El diseño anterior y las demás alternativas siguen disponibles en el panel "Opciones de diseño" de `npm run dev`; si cambia `chosen`, hay que revisar estas filas.
+
 Los tests corren contra el build de producción (`vite preview`) en el Chrome instalado. Las partituras reales de `test_scores/` no van en git; los tests que las usan se saltan si la carpeta no existe.
 
 ## Landing (LAND)
@@ -30,7 +32,7 @@ Los tests corren contra el build de producción (`vite preview`) en el Chrome in
 | NAV-05 | El idioma sale del navegador en cada visita: un navegador en español que entra a una URL sin prefijo es llevado a `/es`; uno en inglés se queda en inglés, aunque su lista de idiomas incluya español después (`en-CO, es, en`) o use una variante regional (`en-CO`, `en-GB`). | auto | ✅ |
 | NAV-06 | El selector EN · ES lleva a la misma página en el otro idioma. El idioma no se guarda en ningún sitio: lo lleva el prefijo de la URL, y las URLs sin prefijo siempre siguen al navegador. Visitar un enlace `/es/...` no cambia lo que verá después en `/`. | auto | ✅ |
 | NAV-07 | Cambiar de idioma dentro del editor conserva los documentos cargados. | auto | ✅ |
-| NAV-08 | En el editor, el logo vuelve a la landing y vacía los documentos; "← New score" vacía los documentos y muestra la zona de carga. | auto | ✅ |
+| NAV-08 | 🎨 En el editor, "New score" cierra todos los documentos y ofrece "Undo" durante 8 s, que los restaura con sus ajustes. El logo lleva a la landing **sin** cerrar nada: volver a la app los muestra de nuevo. | auto | ✅ |
 | NAV-09 | `/about` muestra "About Dark Score", "Who is it for?", los puntos de privacidad, el enlace a GitHub y "Back to home". | auto | ✅ |
 
 ## SEO y HTML estático (SEO)
@@ -89,11 +91,12 @@ Los tests corren contra el build de producción (`vite preview`) en el Chrome in
 
 | ID | Comportamiento esperado | Verificación | Estado |
 |---|---|---|---|
-| VIEW-01 | El zoom empieza en 100 %; + y − cambian de 25 en 25 entre 1 % y 500 %; − se deshabilita en el mínimo y + en el máximo; el tamaño del preview cambia. | auto | ✅ |
+| VIEW-01 | + y − cambian el zoom de 25 en 25 entre 1 % y 500 %; − se deshabilita en el mínimo y + en el máximo; el tamaño del preview cambia. | auto | ✅ |
 | VIEW-02 | Pulsar el porcentaje permite escribir un valor; Enter lo aplica (recortado a 1–500) y Escape cancela. | auto | ✅ |
 | VIEW-03 | Ctrl/⌘ + rueda sobre el preview hace zoom sin hacer zoom del navegador. | auto | ✅ |
 | VIEW-04 | El zoom se mantiene al cambiar de página o de documento. | auto | ✅ |
 | VIEW-05 | "Compare" muestra original y resultado con un divisor arrastrable (ratón); pulsarlo de nuevo vuelve al preview. | auto | ✅ |
+| VIEW-07 | 🎨 Una página se abre ajustada al ancho del visor (se ve entera de lado a lado, con un margen). El primer + o − desde el ajuste salta a un múltiplo de 25; "Fit" vuelve al ajuste, que se recalcula al cambiar el tamaño de la ventana. | auto | ✅ |
 | VIEW-06 | En escritorio el panel de ajustes se redimensiona arrastrando su borde con el ratón, y deja de seguir al puntero al soltar. | auto | ✅ |
 
 ## Historial de ajustes (HIST)
@@ -109,7 +112,7 @@ Los tests corren contra el build de producción (`vite preview`) en el Chrome in
 
 | ID | Comportamiento esperado | Verificación | Estado |
 |---|---|---|---|
-| EXP-01 | "Download" está deshabilitado hasta que hay un resultado. | auto | ✅ |
+| EXP-01 | 🎨 El botón de descarga ("Download PDF", "Download ZIP"…, nombra lo que va a bajar) está deshabilitado hasta que hay un resultado y siempre está a la vista: fijo al pie del panel en escritorio y en una barra inferior en móvil. | auto | ✅ |
 | EXP-02 | Exportar como PDF descarga `<nombre>.pdf` con tantas páginas como el documento. | auto | ✅ |
 | EXP-03 | Exportar como PNG descarga `<nombre>.png` con las dimensiones del resultado; con varias páginas descarga `<nombre>.zip` con `<nombre>-p1.png`, `-p2.png`… | auto | ✅ |
 | EXP-04 | Con varios documentos y formato PDF aparece "Separate / Merged": Separate descarga solo el documento activo; Merged descarga `dark-score-batch.pdf` con todas las páginas de todos. | auto | ✅ |

@@ -265,12 +265,20 @@ export async function zipEntries(zip: Buffer): Promise<string[]> {
   return Object.keys(z.files).sort((a, b) => a.localeCompare(b))
 }
 
+/** The export button ("Download", or "Download PDF" / "Download ZIP" when it names the file). */
+export function downloadButton(page: Page) {
+  return page.getByRole('button', { name: /^(Download|Descargar)\b/ })
+}
+
 /** Clicks the export button and returns the download it produces. */
-export async function exportAndDownload(page: Page, buttonName = /^(Download|Descargar)$/): Promise<Download> {
+export async function exportAndDownload(page: Page): Promise<Download> {
   const waiting = page.waitForEvent('download', { timeout: 60_000 })
-  await page.getByRole('button', { name: buttonName }).click()
+  await downloadButton(page).click()
   return waiting
 }
+
+export const zoomInButton = (page: Page) => page.getByRole('button', { name: 'Zoom in', exact: true })
+export const zoomOutButton = (page: Page) => page.getByRole('button', { name: 'Zoom out', exact: true })
 
 // ---------------------------------------------------------------------------
 // Analytics

@@ -9,7 +9,7 @@ test('ERR-01 a corrupt PDF is reported in the preview and in its tab', async ({ 
   await expect(page.getByText(/Processing\.\.\./)).toHaveCount(0)
   await expect(page.getByRole('alert')).toContainText('This file could not be read')
   await expect(tab).toContainText('!')
-  await expect(page.getByRole('button', { name: 'Download' })).toBeDisabled()
+  await expect(page.getByRole('button', { name: /^Download/ })).toBeDisabled()
 })
 
 test('ERR-01 a password-protected PDF says so', async ({ page }) => {
@@ -32,7 +32,7 @@ test('ERR-01 after a corrupt PDF the next document still works', async ({ page }
   await pickFiles(page, FIXTURES.png)
   await expect(page.getByRole('tab')).toHaveCount(2)
   await waitForResult(page)
-  await expect(page.getByRole('button', { name: 'Download' })).toBeEnabled()
+  await expect(page.getByRole('button', { name: /^Download/ })).toBeEnabled()
 
   // the failed document keeps its own error, the good one its result
   await page.getByRole('tab').first().click()

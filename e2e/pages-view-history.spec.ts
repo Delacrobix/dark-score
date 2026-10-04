@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test'
 import {
   FIXTURES,
   canvasFingerprint,
+  setZoom,
+  zoomInButton,
+  zoomOutButton,
   openEditorWith,
   presetButton,
   previewCanvas,
@@ -12,8 +15,8 @@ import {
   waitForResult,
 } from './helpers'
 
-const prev = (page: Parameters<typeof previewCanvas>[0]) => page.getByRole('button', { name: '‹' })
-const next = (page: Parameters<typeof previewCanvas>[0]) => page.getByRole('button', { name: '›' })
+const prev = (page: Parameters<typeof previewCanvas>[0]) => page.getByRole('button', { name: 'Previous page' })
+const next = (page: Parameters<typeof previewCanvas>[0]) => page.getByRole('button', { name: 'Next page' })
 const zoomLabel = (page: Parameters<typeof previewCanvas>[0]) => page.getByRole('button', { name: /^\d+%$/ })
 
 test.describe('Pages and documents', () => {
@@ -68,32 +71,33 @@ test.describe('Pages and documents', () => {
     await page.getByRole('button', { name: /^Remove/ }).last().click()
     await expect(tabs).toHaveCount(0)
     await expect(page.getByRole('button', { name: uploadPrompt() })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Download' })).toBeDisabled()
+    await expect(page.getByRole('button', { name: /^Download/ })).toBeDisabled()
   })
 
   test('PAGE-04 the tab shows the file name without extension', async ({ page }) => {
     await openEditorWith(page, FIXTURES.pdf2)
-    await expect(page.getByRole('tab').first()).toHaveText(/^two-pages\s*x$/)
+    await expect(page.getByRole('tab').first()).toHaveText(/^two-pages\s*x?$/)
   })
 })
 
 test.describe('Zoom and compare', () => {
   test('VIEW-01 zoom steps by 25 between 1% and 500% and scales the preview', async ({ page }) => {
     await openEditorWith(page, FIXTURES.png)
+    await setZoom(page, 100)
     await expect(zoomLabel(page)).toHaveText('100%')
     const box100 = (await previewCanvas(page).boundingBox())!
     expect(Math.round(box100.width)).toBe(800)
 
-    await page.getByRole('button', { name: '−', exact: true }).click()
+    await zoomOutButton(page).click()
     await expect(zoomLabel(page)).toHaveText('75%')
     const box75 = (await previewCanvas(page).boundingBox())!
     expect(Math.round(box75.width)).toBe(600)
 
-    for (let i = 0; i < 3; i++) await page.getByRole('button', { name: '−', exact: true }).click()
+    for (let i = 0; i < 3; i++) await zoomOutButton(page).click()
     await expect(zoomLabel(page)).toHaveText('1%')
-    await expect(page.getByRole('button', { name: '−', exact: true })).toBeDisabled()
+    await expect(zoomOutButton(page)).toBeDisabled()
 
-    await page.getByRole('button', { name: '+', exact: true }).click()
+    await zoomInButton(page).click()
     await expect(zoomLabel(page)).toHaveText('26%')
   })
 
@@ -109,7 +113,7 @@ test.describe('Zoom and compare', () => {
     await input.fill('9999')
     await input.press('Enter')
     await expect(zoomLabel(page)).toHaveText('500%')
-    await expect(page.getByRole('button', { name: '+', exact: true })).toBeDisabled()
+    await expect(zoomInButton(page)).toBeDisabled()
 
     await zoomLabel(page).click()
     await input.fill('50')
@@ -119,6 +123,7 @@ test.describe('Zoom and compare', () => {
 
   test('VIEW-03 Ctrl + wheel over the preview zooms', async ({ page }) => {
     await openEditorWith(page, FIXTURES.png)
+    await setZoom(page, 100)
     const box = (await previewCanvas(page).boundingBox())!
     await page.mouse.move(box.x + 50, box.y + 50)
     await page.keyboard.down('Control')
@@ -132,8 +137,9 @@ test.describe('Zoom and compare', () => {
 
   test('VIEW-04 zoom is kept across pages and documents', async ({ page }) => {
     await openEditorWith(page, [FIXTURES.pdf2, FIXTURES.png])
-    await page.getByRole('button', { name: '+', exact: true }).click()
-    await page.getByRole('button', { name: '+', exact: true }).click()
+    await setZoom(page, 100)
+    await zoomInButton(page).click()
+    await zoomInButton(page).click()
     await expect(zoomLabel(page)).toHaveText('150%')
     await next(page).click()
     await expect(zoomLabel(page)).toHaveText('150%')
@@ -158,6 +164,32 @@ test.describe('Zoom and compare', () => {
     const after = (await panel.boundingBox())!.width
     await page.mouse.move(box.x + box.width / 2 - 300, box.y + 200)
     expect((await panel.boundingBox())!.width).toBe(after)
+  })
+
+  test('VIEW-07 a page opens fitted to the viewer width; "Fit" returns to it after zooming', async ({ page }) => {
+    await openEditorWith(page, FIXTURES.pdf1) // 2550 px wide at 300 DPI
+    const fitButton = page.getByRole('button', { name: 'Fit to width' })
+    await expect(fitButton).toHaveAttribute('aria-pressed', 'true')
+    const fitted = Number((await zoomLabel(page).textContent())!.replace('%', ''))
+    expect(fitted).toBeLessThan(100)
+
+    // the whole width of the page is on screen, with a small margin
+    const viewer = await page.locator('main canvas').first().locator('xpath=ancestor::div[contains(@class,"overflow-auto")][1]').boundingBox()
+    const sheet = await previewCanvas(page).boundingBox()
+    expect(sheet!.width).toBeLessThanOrEqual(viewer!.width)
+    expect(sheet!.width).toBeGreaterThan(viewer!.width - 60)
+
+    // the first step from a fitted value lands on a multiple of 25
+    await zoomInButton(page).click()
+    await expect(zoomLabel(page)).toHaveText(`${Math.floor(fitted / 25) * 25 + 25}%`)
+    await expect(fitButton).toHaveAttribute('aria-pressed', 'false')
+
+    await fitButton.click()
+    await expect(zoomLabel(page)).toHaveText(`${fitted}%`)
+
+    // and it refits when the window changes size
+    await page.setViewportSize({ width: 1600, height: 800 })
+    await expect.poll(async () => Number((await zoomLabel(page).textContent())!.replace('%', ''))).toBeGreaterThan(fitted)
   })
 
   test('VIEW-05 Compare shows original and result with a draggable divider', async ({ page }) => {

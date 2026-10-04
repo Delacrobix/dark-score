@@ -138,17 +138,32 @@ test.describe('Routes and language', () => {
     await expect(previewCanvas(page)).toBeVisible()
   })
 
-  test('NAV-08 logo goes home and clears; "New score" clears and shows the drop zone', async ({ page }) => {
-    await openEditorWith(page, FIXTURES.png)
-    await page.getByRole('button', { name: '← New score' }).click()
+  test('NAV-08 "New score" closes everything with an Undo; the logo goes home without losing the scores', async ({ page }) => {
+    await openEditorWith(page, [FIXTURES.png, FIXTURES.pdf1])
+    await page.getByRole('button', { name: /New score/ }).click()
     await expect(page.getByRole('button', { name: uploadPrompt() })).toBeVisible()
     await expect(page.getByRole('tab')).toHaveCount(0)
+    await expect(page.getByRole('status')).toContainText('2 scores closed.')
 
-    await openEditorWith(page, FIXTURES.png)
+    await page.getByRole('button', { name: 'Undo' }).click()
+    await expect(page.getByRole('tab')).toHaveCount(2)
+    await waitForResult(page)
+    await expect(page.getByRole('status')).toHaveCount(0)
+
+    // the logo is navigation, not a reset
     await page.getByRole('button', { name: 'Go to home' }).click()
     await expect(page).toHaveURL(/\/$/)
-    await page.goto('/app')
-    await expect(page.getByRole('tab')).toHaveCount(0)
+    await page.getByRole('link', { name: 'Open the app' }).click()
+    await expect(page.getByRole('tab')).toHaveCount(2)
+  })
+
+  test('NAV-08 the Undo offer goes away by itself', async ({ page }) => {
+    await page.clock.install()
+    await openEditorWith(page, FIXTURES.png)
+    await page.getByRole('button', { name: /New score/ }).click()
+    await expect(page.getByRole('status')).toContainText('Score closed.')
+    await page.clock.runFor(9_000)
+    await expect(page.getByRole('status')).toHaveCount(0)
   })
 
   test('NAV-09 the About page has its sections and links', async ({ page }) => {

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import {
   FIXTURES,
+  downloadButton,
   downloadBuffer,
   exportAndDownload,
   openEditor,
@@ -11,7 +12,7 @@ import {
   zipEntries,
 } from './helpers'
 
-const download = (page: Parameters<typeof openEditor>[0]) => page.getByRole('button', { name: 'Download' })
+const download = downloadButton
 const format = (page: Parameters<typeof openEditor>[0], f: 'pdf' | 'png') =>
   page.getByRole('button', { name: new RegExp(`^${f}( \\(ZIP\\))?$`, 'i') })
 
@@ -83,7 +84,7 @@ test.describe('Export', () => {
   test('EXP-06 the button returns to Download after exporting and works again', async ({ page }) => {
     await openEditorWith(page, FIXTURES.png)
     await exportAndDownload(page)
-    await expect(download(page)).toHaveText('Download')
+    await expect(download(page)).toHaveText(/^Download/)
     await expect(download(page)).toBeEnabled()
     const again = await exportAndDownload(page)
     expect(again.suggestedFilename()).toBe('score.pdf')

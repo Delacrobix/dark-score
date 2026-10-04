@@ -10,6 +10,7 @@
 ## Pendientes
 
 ### Antes de desplegar
+- [ ] Commitear y desplegar el rediseño (13 opciones, elegidas el 2026-10-04: todas las propuestas). Las variantes anteriores se quedan en el código, conmutables desde el panel de desarrollo.
 - [ ] Commitear lo pendiente y `git push -u origin growth/seo-perf`.
 - [ ] Revisar a ojo las capturas de `e2e/.review/` (partituras reales antes/después): ¿la limpieza se ve bien? Ojo: el resaltador amarillo y las anotaciones a lápiz claras desaparecen con limpieza 140 (`Brisas del Pamplonita`).
 - [ ] Probar en un iPad real con Safari (RESP-07): el layout y el touch están cubiertos solo con emulación en Chrome.
@@ -29,6 +30,9 @@
 - [ ] Artículo largo tipo "how to read sheet music at night without eye strain" (blog o sección) para long-tail.
 
 ## Hecho
+
+### Diseño (2026-10-03/04)
+- [x] 13 mejoras de UI/UX como opciones conmutables (`src/design/`): editor "estudio" con visor que se ajusta al ancho y descarga siempre visible, modos con muestra de paleta, "Nueva partitura" con Deshacer y logo no destructivo, editor vacío guiado, contraste AA, iconos dibujados, garantías junto a la acción, botón de ejemplo, comparador primero en móvil, "¿Para quién es?" con su paleta, Ko-fi discreto y titulares en Newsreader. Elegidas todas; el diseño anterior sigue disponible en el panel de `npm run dev`.
 
 ### Calidad (2026-09-16/22)
 - [x] Fix: un navegador en inglés regional con español en la lista (`en-CO, es, en`, la configuración de macOS por defecto aquí) abría la app en español. `supportedLngs` no incluía `en-CO`, i18next lo descartaba y caía en `es`. Añadido `load: 'languageOnly'`.
