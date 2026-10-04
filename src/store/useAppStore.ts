@@ -1,6 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Rejection } from '../lib/fileIntake'
+import type { ExportFormat } from '../lib/exporter'
+import { getDesignOption } from '../design/useDesignOption'
 import {
   type ProcessingSettings,
   type PageData,
@@ -56,6 +58,23 @@ function updateDoc(docs: DocumentEntry[], index: number, patch: Partial<Document
   return updated
 }
 
+/** 'fit-*' follows the viewer size; 'manual' is a fixed percentage. */
+export type ZoomMode = 'manual' | 'fit-width' | 'fit-page'
+
+/** Zoom mode a fresh editor starts in, from the 'zoom' design option. */
+export function defaultZoomMode(): ZoomMode {
+  const option = getDesignOption('zoom')
+  if (option === 'ancho') return 'fit-width'
+  if (option === 'pagina') return 'fit-page'
+  return 'manual'
+}
+
+/** What a document set looked like before it was cleared, for Undo. */
+export interface ClearedSnapshot {
+  documents: DocumentEntry[]
+  currentDocIndex: number
+}
+
 interface AppState {
   documents: DocumentEntry[]
   currentDocIndex: number
@@ -64,9 +83,17 @@ interface AppState {
 
   exportDpi: 200 | 300
   exportMode: ExportMode
+  exportFormat: ExportFormat
   zoomPercent: number
+  /** null = not chosen yet, use defaultZoomMode() */
+  zoomMode: ZoomMode | null
+  /** Percentage that fits the current page in the viewer, measured by it. */
+  fitPercent: number | null
 
   setZoomPercent: (z: number) => void
+  setZoomMode: (mode: ZoomMode) => void
+  setFitPercent: (z: number) => void
+  setExportFormat: (format: ExportFormat) => void
   setExportDpi: (dpi: 200 | 300) => void
   setExportMode: (mode: ExportMode) => void
 
@@ -92,20 +119,29 @@ interface AppState {
   setRejectedFiles: (rejected: Rejection[]) => void
 
   reset: () => void
+  /** Clears the documents and returns what was there, so it can be restored. */
+  clearDocuments: () => ClearedSnapshot
+  restoreDocuments: (snapshot: ClearedSnapshot) => void
 }
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       documents: [],
       currentDocIndex: 0,
       rejectedFiles: [],
 
       exportDpi: 300,
       exportMode: 'separate',
+      exportFormat: 'pdf',
       zoomPercent: 100,
+      zoomMode: null,
+      fitPercent: null,
 
-      setZoomPercent: (z) => set({ zoomPercent: z }),
+      setZoomPercent: (z) => set({ zoomPercent: z, zoomMode: 'manual' }),
+      setZoomMode: (mode) => set({ zoomMode: mode }),
+      setFitPercent: (z) => set((state) => (state.fitPercent === z ? {} : { fitPercent: z })),
+      setExportFormat: (format) => set({ exportFormat: format }),
       setExportDpi: (dpi) => set({ exportDpi: dpi }),
       setExportMode: (mode) => set({ exportMode: mode }),
 
@@ -281,6 +317,19 @@ export const useAppStore = create<AppState>()(
           currentDocIndex: 0,
           rejectedFiles: [],
         }),
+
+      clearDocuments: () => {
+        const { documents, currentDocIndex } = get()
+        set({ documents: [], currentDocIndex: 0, rejectedFiles: [] })
+        return { documents, currentDocIndex }
+      },
+
+      restoreDocuments: (snapshot) =>
+        set((state) => ({
+          // anything opened in the meantime stays, after the restored set
+          documents: [...snapshot.documents, ...state.documents],
+          currentDocIndex: snapshot.currentDocIndex,
+        })),
     }),
     {
       name: 'dark-score-settings',
@@ -291,3 +340,10 @@ export const useAppStore = create<AppState>()(
     }
   )
 )
+
+/** Zoom the viewer should draw at right now, in percent. */
+export function selectEffectiveZoom(state: Pick<AppState, 'zoomMode' | 'zoomPercent' | 'fitPercent'>): number {
+  const mode = state.zoomMode ?? defaultZoomMode()
+  if (mode === 'manual') return state.zoomPercent
+  return state.fitPercent ?? state.zoomPercent
+}

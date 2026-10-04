@@ -10,9 +10,11 @@ interface UploadZoneProps {
   compact?: boolean
   /** Called after files were accepted and added to the store. */
   onFilesAdded?: () => void
+  /** The "never leave your device" line under the zone. */
+  showPrivacy?: boolean
 }
 
-export function UploadZone({ compact = false, onFilesAdded }: Readonly<UploadZoneProps> = {}) {
+export function UploadZone({ compact = false, onFilesAdded, showPrivacy = true }: Readonly<UploadZoneProps> = {}) {
   const { t } = useTranslation()
   const addDocuments = useAppStore((s) => s.addDocuments)
   const setRejectedFiles = useAppStore((s) => s.setRejectedFiles)
@@ -97,12 +99,12 @@ export function UploadZone({ compact = false, onFilesAdded }: Readonly<UploadZon
         onChange={onInputChange}
       />
 
-      <p className="text-xs text-zinc-700 text-center flex items-center justify-center gap-1.5">
+      {showPrivacy && <p className="text-xs text-zinc-700 text-center flex items-center justify-center gap-1.5">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
         {t('upload.privacy')}
-      </p>
+      </p>}
     </div>
   )
 }

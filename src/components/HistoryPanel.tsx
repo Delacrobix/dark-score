@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { PRESETS } from '../types'
+import { Glyph } from './Icon'
 
 function formatTime(timestamp: number): string {
   const d = new Date(timestamp)
@@ -24,6 +25,7 @@ export function HistoryPanel() {
     <div>
       <button
         onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
         className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
       >
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -33,7 +35,7 @@ export function HistoryPanel() {
         </svg>
         {t('history.label')}
         <span className="text-zinc-700">({history.length})</span>
-        <span className="ml-auto">{open ? '▴' : '▾'}</span>
+        <span className="ml-auto"><Glyph icon={open ? 'chevron-up' : 'chevron-down'} text={open ? '▴' : '▾'} size={12} /></span>
       </button>
 
       {open && (

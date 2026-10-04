@@ -1,26 +1,17 @@
-import { useRef, useState, useCallback, useEffect } from 'react'
-import { useAppStore } from '../store/useAppStore'
+import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useViewerZoom, MIN_ZOOM, MAX_ZOOM } from '../lib/useViewerZoom'
+import { Glyph, Icon } from './Icon'
 
-const ZOOM_STEP = 25
-const MIN_ZOOM = 1
-const MAX_ZOOM = 500
+const stepButton =
+  'w-7 h-7 flex items-center justify-center rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm'
 
-function clampZoom(v: number) {
-  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, v))
-}
-
-export function ZoomControls({ scrollContainer }: { scrollContainer?: React.RefObject<HTMLDivElement | null> }) {
+/** − 100% + (and "Fit" when the editor offers a fitted zoom). The percentage can be typed. */
+export function ZoomControls({ disabled = false }: Readonly<{ disabled?: boolean }>) {
+  const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
-  const { zoomPercent, setZoomPercent } = useAppStore()
+  const { zoom, isFit, fitMode, zoomIn, zoomOut, setZoom, fit } = useViewerZoom()
   const [isEditing, setIsEditing] = useState(false)
-
-  const zoomIn = useCallback(() => {
-    setZoomPercent(clampZoom(zoomPercent + ZOOM_STEP))
-  }, [zoomPercent, setZoomPercent])
-
-  const zoomOut = useCallback(() => {
-    setZoomPercent(clampZoom(zoomPercent - ZOOM_STEP))
-  }, [zoomPercent, setZoomPercent])
 
   const handleEditStart = () => {
     setIsEditing(true)
@@ -30,9 +21,7 @@ export function ZoomControls({ scrollContainer }: { scrollContainer?: React.RefO
   const handleEditConfirm = () => {
     setIsEditing(false)
     const val = Number.parseInt(inputRef.current?.value ?? '', 10)
-    if (!Number.isNaN(val) && val >= MIN_ZOOM) {
-      setZoomPercent(clampZoom(val))
-    }
+    if (!Number.isNaN(val) && val >= MIN_ZOOM) setZoom(val)
   }
 
   const handleEditKeyDown = (e: React.KeyboardEvent) => {
@@ -40,30 +29,16 @@ export function ZoomControls({ scrollContainer }: { scrollContainer?: React.RefO
     if (e.key === 'Escape') setIsEditing(false)
   }
 
-  // Ctrl+scroll to zoom
-  useEffect(() => {
-    const container = scrollContainer?.current
-    if (!container) return
-
-    const onWheel = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return
-      e.preventDefault()
-      if (e.deltaY < 0) setZoomPercent(clampZoom(zoomPercent + ZOOM_STEP))
-      else setZoomPercent(clampZoom(zoomPercent - ZOOM_STEP))
-    }
-
-    container.addEventListener('wheel', onWheel, { passive: false })
-    return () => container.removeEventListener('wheel', onWheel)
-  }, [zoomPercent, setZoomPercent, scrollContainer])
-
   return (
     <div className="flex items-center justify-center gap-2">
       <button
+        type="button"
         onClick={zoomOut}
-        disabled={zoomPercent <= MIN_ZOOM}
-        className="w-7 h-7 flex items-center justify-center rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm"
+        disabled={disabled || zoom <= MIN_ZOOM}
+        aria-label={t('viewer.zoomOut')}
+        className={stepButton}
       >
-        −
+        <Glyph icon="minus" text="−" size={14} />
       </button>
       {isEditing ? (
         <input
@@ -71,26 +46,48 @@ export function ZoomControls({ scrollContainer }: { scrollContainer?: React.RefO
           type="number"
           min={MIN_ZOOM}
           max={MAX_ZOOM}
-          defaultValue={zoomPercent}
+          defaultValue={zoom}
+          aria-label={t('viewer.zoomLevel')}
           onBlur={handleEditConfirm}
           onKeyDown={handleEditKeyDown}
           className="w-14 text-xs text-center text-white bg-zinc-800 border border-zinc-600 rounded px-1 py-0.5 tabular-nums outline-none focus:border-purple-500 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
       ) : (
         <button
+          type="button"
           onClick={handleEditStart}
-          className="text-xs text-zinc-500 hover:text-white transition-colors cursor-pointer tabular-nums min-w-[3rem] text-center"
+          disabled={disabled}
+          className="text-xs text-zinc-500 hover:text-white disabled:opacity-30 transition-colors cursor-pointer tabular-nums min-w-[3rem] text-center"
         >
-          {zoomPercent}%
+          {zoom}%
         </button>
       )}
       <button
+        type="button"
         onClick={zoomIn}
-        disabled={zoomPercent >= MAX_ZOOM}
-        className="w-7 h-7 flex items-center justify-center rounded border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm"
+        disabled={disabled || zoom >= MAX_ZOOM}
+        aria-label={t('viewer.zoomIn')}
+        className={stepButton}
       >
-        +
+        <Glyph icon="plus" text="+" size={14} />
       </button>
+      {fitMode !== 'manual' && (
+        <button
+          type="button"
+          onClick={fit}
+          disabled={disabled}
+          aria-pressed={isFit}
+          aria-label={t(fitMode === 'fit-page' ? 'viewer.fitPage' : 'viewer.fitWidth')}
+          title={t(fitMode === 'fit-page' ? 'viewer.fitPage' : 'viewer.fitWidth')}
+          className={`h-7 px-2 flex items-center gap-1.5 rounded border text-xs transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed
+            ${isFit
+              ? 'border-purple-500/60 bg-purple-500/10 text-purple-200'
+              : 'border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500'}`}
+        >
+          <Icon name="fit" size={13} />
+          <span className="hidden sm:inline">{t('viewer.fit')}</span>
+        </button>
+      )}
     </div>
   )
 }

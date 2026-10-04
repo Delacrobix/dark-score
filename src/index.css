@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Display serif for landing and About headings ('headings' design option).
+   Only downloaded by pages that use .font-display. */
+@import "@fontsource-variable/newsreader/wght.css";
 
 @theme {
   --color-bg-base: #0d0d0d;
@@ -8,6 +11,48 @@
   --color-text-primary: #f0f0f0;
   --color-text-secondary: #8a8a8a;
   --color-accent: #c084fc;
+
+  /* Secondary text that still reads: >= 4.5:1 on zinc-950 and black */
+  --color-text-subtle: #93939c; /* 6.5:1 */
+  --color-text-muted: #85858e; /* 5.4:1 */
+
+  --font-display: "Newsreader Variable", Georgia, "Times New Roman", serif;
+}
+
+/* 'contrast' design option: lifts the dim greys used for secondary text to
+   readable values. Same specificity as the utilities and later in the layer,
+   so hover/focus variants still win. Opt out with <html data-contrast="actual">. */
+@layer utilities {
+  :where(:root:not([data-contrast="actual"])) .text-zinc-500 {
+    color: var(--color-text-subtle);
+  }
+  :where(:root:not([data-contrast="actual"])) :is(.text-zinc-600, .text-zinc-700) {
+    color: var(--color-text-muted);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@layer base {
+  ::selection {
+    background-color: rgb(192 132 252 / 0.38);
+    color: #fff;
+  }
+
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  input,
+  textarea {
+    caret-color: var(--color-accent);
+  }
 }
 
 * {

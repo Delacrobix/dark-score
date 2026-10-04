@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { trackEvent } from '../lib/analytics'
 import { ACCEPTED_EXT, intakeFiles, intakeLabel } from '../lib/fileIntake'
+import { Glyph } from './Icon'
 
 export function DocumentTabs() {
   const { t } = useTranslation()
@@ -49,10 +50,10 @@ export function DocumentTabs() {
           )}
           <button
             onClick={(e) => { e.stopPropagation(); removeDocument(i) }}
-            className="ml-0.5 text-zinc-600 hover:text-zinc-300 transition-colors cursor-pointer"
+            className="ml-0.5 -mr-1 w-4 h-4 inline-flex items-center justify-center rounded text-zinc-600 hover:text-zinc-200 hover:bg-zinc-700/60 transition-colors cursor-pointer"
             aria-label={`Remove ${doc.label}`}
           >
-            x
+            <Glyph icon="close" text="x" size={12} />
           </button>
         </div>
       ))}

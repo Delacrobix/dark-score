@@ -1,6 +1,7 @@
 import { useId, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { scoreSvg } from '../lib/scoreSvg'
+import { Glyph } from './Icon'
 
 const LIGHT = { bg: '#ffffff', fg: '#111111' }
 const DARK = { bg: '#000000', fg: '#ffffff' } // "Dark stage" preset colours
@@ -16,7 +17,7 @@ export function BeforeAfter() {
   const layer = 'absolute inset-0 [&>svg]:w-full [&>svg]:h-full [&>svg]:block'
 
   return (
-    <figure className="relative w-full aspect-[1000/620] rounded-xl overflow-hidden border border-zinc-800 shadow-2xl shadow-purple-950/40 select-none">
+    <figure className="relative w-full aspect-[1000/620] rounded-xl overflow-hidden border border-zinc-800 shadow-2xl shadow-purple-950/40 select-none has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-4 has-[input:focus-visible]:outline-purple-400">
       <div className={layer} aria-hidden="true" dangerouslySetInnerHTML={{ __html: dark }} />
       <div
         className={layer}
@@ -28,7 +29,7 @@ export function BeforeAfter() {
       {/* divider */}
       <div className="absolute top-0 bottom-0 w-0.5 bg-purple-400 pointer-events-none" style={{ left: `${pos}%` }} aria-hidden="true">
         <span className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-purple-500 text-white flex items-center justify-center text-xs shadow-lg">
-          ⇔
+          <Glyph icon="arrows-h" text="⇔" size={14} />
         </span>
       </div>
 

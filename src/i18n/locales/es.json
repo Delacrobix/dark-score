@@ -4,6 +4,7 @@
     "description": "Leer partituras en pantalla de noche, o en un escenario oscuro, con el fondo blanco tradicional es agotador para la vista. Dark Score invierte los colores de tus PDFs e imágenes de forma inteligente: elimina el ruido del escaneo, engrosa las líneas del pentagrama y aplica el esquema de color que prefieras.",
     "cta": "Empezar",
     "eyebrow": "Gratis · Sin registro · Funciona en tu navegador",
+    "facts": ["Gratis", "Sin registro", "Funciona en tu navegador", "Tus partituras nunca salen de tu dispositivo"],
     "sample": "Probar con una partitura de ejemplo",
     "sampleHint": "¿No tienes un archivo a mano?",
     "demo": {
@@ -40,7 +41,12 @@
     "local": "Procesamiento local",
     "localTooltip": "Tus archivos se procesan completamente en tu navegador. Nada se sube a ningún servidor.",
     "about": "Acerca de",
-    "newScore": "← Nueva partitura"
+    "newScore": "← Nueva partitura",
+    "newScoreLabel": "Nueva partitura",
+    "confirmClear_one": "¿Cerrar esta partitura?",
+    "confirmClear_other": "¿Cerrar las {{count}} partituras?",
+    "confirmYes": "Cerrar",
+    "confirmNo": "Cancelar"
   },
   "steps": {
     "upload": "Subir",
@@ -84,6 +90,7 @@
     "dilation": "Engrosamiento de líneas",
     "dilationWarning": "Nivel alto: las notas en pasajes densos pueden empastarse.",
     "reset": "Restablecer",
+    "resetNamed": "Restablecer {{label}}",
     "processing": "Procesando..."
   },
   "history": {
@@ -101,6 +108,8 @@
     "addMore": "+ Agregar archivos"
   },
   "export": {
+    "title": "Exportar",
+    "downloadAs": "Descargar {{kind}}",
     "button": "Descargar",
     "exporting": "Exportando...",
     "zipSuffix": " (ZIP)",
@@ -111,6 +120,27 @@
     "original": "Original",
     "result": "Resultado",
     "toggle": "Comparar"
+  },
+  "viewer": {
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar",
+    "zoomLevel": "Nivel de zoom, en porcentaje",
+    "fit": "Ajustar",
+    "fitWidth": "Ajustar al ancho",
+    "fitPage": "Ver la página completa",
+    "prevPage": "Página anterior",
+    "nextPage": "Página siguiente",
+    "updating": "Aplicando…"
+  },
+  "panel": {
+    "emptyTitle": "Abre una partitura para ajustarla",
+    "emptyBody": "Los modos y ajustes se aplican a la partitura abierta. Suelta un archivo a la izquierda o prueba con el ejemplo."
+  },
+  "toast": {
+    "cleared_one": "Partitura cerrada.",
+    "cleared_other": "{{count}} partituras cerradas.",
+    "undo": "Deshacer",
+    "dismiss": "Cerrar aviso"
   },
   "donate": {
     "label": "Apoyar el proyecto"
@@ -123,6 +153,7 @@
     },
     "useCases": {
       "title": "Para quien es?",
+      "preset": "Modo: {{name}}",
       "nightOwls": {
         "title": "Trasnochadores",
         "body": "Practica hasta tarde sin cansar la vista. El preset de filtro de luz azul esta disenado para sesiones largas con poca luz."

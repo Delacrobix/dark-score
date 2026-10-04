@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next'
+import { useDesignOption } from '../design/useDesignOption'
+import { Icon } from './Icon'
 
 const KOFI_URL = 'https://ko-fi.com/R6R01X43VF'
 const KOFI_COLOR = '#FF5E5B'
@@ -22,6 +24,7 @@ function CupIcon({ size }: Readonly<{ size: number }>) {
 
 export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtle' | 'prominent' }>) {
   const { t } = useTranslation()
+  const style = useDesignOption('support')
 
   if (variant === 'prominent') {
     return (
@@ -33,6 +36,21 @@ export function DonateButton({ variant = 'subtle' }: Readonly<{ variant?: 'subtl
         style={{ backgroundColor: KOFI_COLOR }}
       >
         <CupIcon size={16} />
+        {t('donate.label')}
+      </a>
+    )
+  }
+
+  if (style === 'discreto') {
+    // Neutral like the other links; the heart warms up on hover
+    return (
+      <a
+        href={KOFI_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group text-xs text-zinc-400 hover:text-rose-200 transition-colors flex items-center gap-1.5"
+      >
+        <Icon name="heart" size={13} className="text-zinc-500 group-hover:text-rose-400 group-hover:fill-rose-400/25 transition-colors" />
         {t('donate.label')}
       </a>
     )

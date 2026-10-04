@@ -1,42 +1,115 @@
 import { useTranslation } from 'react-i18next'
 import { useAppStore } from '../store/useAppStore'
 import { trackEvent } from '../lib/analytics'
-import { PRESETS, DEFAULT_SETTINGS } from '../types'
+import { PRESETS, DEFAULT_SETTINGS, type Preset, type ProcessingSettings } from '../types'
+import { useDesignOption } from '../design/useDesignOption'
 import { HistoryPanel } from './HistoryPanel'
+import { ExportSettings } from './ExportButton'
+import { PresetSwatch } from './PresetSwatch'
+import { Glyph } from './Icon'
 
-export function ControlsPanel() {
+const sectionTitle = 'text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3'
+
+interface ControlsPanelProps {
+  /** 'estudio': no own scroll (the panel scrolls) and export settings live here. */
+  layout?: 'actual' | 'estudio'
+}
+
+export function ControlsPanel({ layout = 'actual' }: Readonly<ControlsPanelProps>) {
   const { t } = useTranslation()
   const { documents, currentDocIndex, applyPreset, updateSettings, updateSettingsLive, commitToHistory, resetSlider, applySettingsToAll } = useAppStore()
   const currentDoc = documents[currentDocIndex]
   const settings = currentDoc?.settings ?? DEFAULT_SETTINGS
   const showApplyAll = documents.length > 1
+  const presetStyle = useDesignOption('presets')
+
+  const choose = (preset: Preset) => {
+    applyPreset(preset.id)
+    trackEvent('preset', 'apply_preset', preset.id)
+  }
 
   return (
-    <div className="flex flex-col gap-6 h-full overflow-y-auto">
+    <div className={layout === 'estudio' ? 'flex flex-col gap-7' : 'flex flex-col gap-6 h-full overflow-y-auto'}>
       {/* Presets */}
       <section>
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-3">
+        <h2 className={sectionTitle}>
           {t('presets.label')}
         </h2>
-        <div className="grid grid-cols-2 xl:grid-cols-3 gap-2">
-          {PRESETS.map((preset) => {
-            const active = settings.presetId === preset.id
-            return (
-              <button
-                key={preset.id}
-                onClick={() => { applyPreset(preset.id); trackEvent('preset', 'apply_preset', preset.id) }}
-                className={`text-left px-3 py-2.5 rounded-lg border transition-colors text-xs cursor-pointer
-                  ${active
-                    ? 'border-purple-500 bg-purple-500/10 text-white'
-                    : 'border-zinc-800 hover:border-zinc-600 text-zinc-300'
-                  }`}
-              >
-                <span className="block font-medium mb-0.5 break-words">{t(`presets.${preset.id}.name`)}</span>
-                <span className="text-zinc-600 block break-words">{t(`presets.${preset.id}.description`)}</span>
-              </button>
-            )
-          })}
-        </div>
+        {presetStyle === 'actual' && (
+          <div className="grid grid-cols-2 xl:grid-cols-3 gap-2">
+            {PRESETS.map((preset) => {
+              const active = settings.presetId === preset.id
+              return (
+                <button
+                  key={preset.id}
+                  onClick={() => choose(preset)}
+                  aria-pressed={active}
+                  className={`text-left px-3 py-2.5 rounded-lg border transition-colors text-xs cursor-pointer
+                    ${active
+                      ? 'border-purple-500 bg-purple-500/10 text-white'
+                      : 'border-zinc-800 hover:border-zinc-600 text-zinc-300'
+                    }`}
+                >
+                  <span className="block font-medium mb-0.5 break-words">{t(`presets.${preset.id}.name`)}</span>
+                  <span className="text-zinc-600 block break-words">{t(`presets.${preset.id}.description`)}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+        {presetStyle === 'muestras' && (
+          <div className="grid grid-cols-2 gap-2">
+            {PRESETS.map((preset) => {
+              const active = settings.presetId === preset.id
+              const colors = swatchColors(preset, settings)
+              return (
+                <button
+                  key={preset.id}
+                  onClick={() => choose(preset)}
+                  aria-pressed={active}
+                  className={`flex flex-col gap-2 text-left p-1.5 pb-2 rounded-lg border transition-colors cursor-pointer
+                    ${active
+                      ? 'border-purple-500 bg-purple-500/10 text-white'
+                      : 'border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900 text-zinc-200'
+                    }`}
+                >
+                  <span className="min-w-0 order-2 px-1">
+                    <span className="block text-[13px] font-medium leading-tight truncate">{t(`presets.${preset.id}.name`)}</span>
+                    <span className="block text-[11px] text-zinc-500 leading-tight mt-0.5 truncate">{t(`presets.${preset.id}.description`)}</span>
+                  </span>
+                  <PresetSwatch wide bg={colors.bg} fg={colors.fg} className="order-1 w-full h-8 block" />
+                </button>
+              )
+            })}
+          </div>
+        )}
+        {presetStyle === 'lista' && (
+          <div className="flex flex-col -mx-2">
+            {PRESETS.map((preset) => {
+              const active = settings.presetId === preset.id
+              const colors = swatchColors(preset, settings)
+              return (
+                <button
+                  key={preset.id}
+                  onClick={() => choose(preset)}
+                  aria-pressed={active}
+                  className={`flex items-center gap-3 text-left px-2 py-1.5 rounded-md transition-colors cursor-pointer
+                    ${active ? 'bg-purple-500/15 text-white' : 'hover:bg-zinc-900 text-zinc-200'}`}
+                >
+                  <span className="min-w-0 flex-1 order-2 flex items-baseline justify-between gap-3">
+                    <span className="text-[13px] font-medium truncate">{t(`presets.${preset.id}.name`)}</span>
+                    <span className="text-[11px] text-zinc-500 truncate">{t(`presets.${preset.id}.description`)}</span>
+                  </span>
+                  <PresetSwatch
+                    bg={colors.bg}
+                    fg={colors.fg}
+                    className={`order-1 w-9 h-6 shrink-0 rounded-[5px] ${active ? 'ring-2 ring-purple-400 ring-offset-2 ring-offset-zinc-950' : ''}`}
+                  />
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {settings.presetId === 'custom' && (
           <div className="mt-3 flex gap-3">
@@ -144,6 +217,13 @@ export function ControlsPanel() {
         </button>
       )}
 
+      {layout === 'estudio' && (
+        <div>
+          <h2 className={sectionTitle}>{t('export.title')}</h2>
+          <ExportSettings />
+        </div>
+      )}
+
       {/* History */}
       <HistoryPanel />
 
@@ -174,9 +254,10 @@ function Slider({ label, value, min, max, step = 1, onChange, onCommit, onReset,
           <button
             onClick={onReset}
             title={t('controls.reset')}
+            aria-label={t('controls.resetNamed', { label })}
             className="text-zinc-700 hover:text-zinc-400 transition-colors cursor-pointer leading-none"
           >
-            ↺
+            <Glyph icon="reset" text="↺" size={12} />
           </button>
         </div>
       </div>
@@ -190,4 +271,10 @@ function Slider({ label, value, min, max, step = 1, onChange, onCommit, onReset,
       />
     </div>
   )
+}
+
+/** Swatch colours: the preset's own, or for Custom whatever the document uses now. */
+function swatchColors(preset: Preset, settings: ProcessingSettings) {
+  if (preset.id === 'custom') return { bg: settings.bgColor, fg: settings.fgColor }
+  return { bg: preset.bgColor, fg: preset.fgColor }
 }

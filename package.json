@@ -16,6 +16,7 @@
     "test:e2e:coverage": "node scripts/e2e-coverage.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/newsreader": "^5.3.0",
     "@sentry/react": "^10.47.0",
     "i18next": "^26.0.3",
     "i18next-browser-languagedetector": "^8.2.1",

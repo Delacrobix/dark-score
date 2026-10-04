@@ -4,6 +4,7 @@
     "description": "Reading sheet music on screen at night, or on a dark stage, with the traditional white background is exhausting for your eyes. Dark Score intelligently inverts the colors of your PDFs and images: it removes scan noise, thickens staff lines, and applies the color scheme you prefer.",
     "cta": "Get started",
     "eyebrow": "Free · No sign-up · Runs in your browser",
+    "facts": ["Free", "No sign-up", "Runs in your browser", "Your scores never leave your device"],
     "sample": "Try with a sample score",
     "sampleHint": "No file at hand?",
     "demo": {
@@ -40,7 +41,12 @@
     "local": "Local processing",
     "localTooltip": "Your files are processed entirely in your browser. Nothing is uploaded to any server.",
     "about": "About",
-    "newScore": "← New score"
+    "newScore": "← New score",
+    "newScoreLabel": "New score",
+    "confirmClear_one": "Close this score?",
+    "confirmClear_other": "Close all {{count}} scores?",
+    "confirmYes": "Close",
+    "confirmNo": "Cancel"
   },
   "steps": {
     "upload": "Upload",
@@ -84,6 +90,7 @@
     "dilation": "Line thickening",
     "dilationWarning": "High level: notes in dense passages may bleed together.",
     "reset": "Reset",
+    "resetNamed": "Reset {{label}}",
     "processing": "Processing..."
   },
   "history": {
@@ -101,6 +108,8 @@
     "addMore": "+ Add files"
   },
   "export": {
+    "title": "Export",
+    "downloadAs": "Download {{kind}}",
     "button": "Download",
     "exporting": "Exporting...",
     "zipSuffix": " (ZIP)",
@@ -111,6 +120,27 @@
     "original": "Original",
     "result": "Result",
     "toggle": "Compare"
+  },
+  "viewer": {
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomLevel": "Zoom level, in percent",
+    "fit": "Fit",
+    "fitWidth": "Fit to width",
+    "fitPage": "Fit whole page",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "updating": "Applying…"
+  },
+  "panel": {
+    "emptyTitle": "Open a score to adjust it",
+    "emptyBody": "Modes and adjustments apply to the score you open. Drop a file on the left, or try the sample."
+  },
+  "toast": {
+    "cleared_one": "Score closed.",
+    "cleared_other": "{{count}} scores closed.",
+    "undo": "Undo",
+    "dismiss": "Dismiss"
   },
   "donate": {
     "label": "Support the project"
@@ -123,6 +153,7 @@
     },
     "useCases": {
       "title": "Who is it for?",
+      "preset": "Preset: {{name}}",
       "nightOwls": {
         "title": "Night owls",
         "body": "Practice late without eye strain. The blue light filter preset is designed for long sessions in low light."

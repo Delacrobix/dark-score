@@ -5,43 +5,18 @@ import { exportAsPdf, exportAsPng } from '../lib/exporter'
 import type { ExportFormat } from '../lib/exporter'
 import type { ExportMode } from '../types'
 import { trackEvent } from '../lib/analytics'
+import { Icon } from './Icon'
 
 const DPI_OPTIONS = [200, 300] as const
 
-export function ExportButton() {
+/** Format, merged/separate and DPI. */
+export function ExportSettings() {
   const { t } = useTranslation()
-  const { documents, currentDocIndex, exportDpi, exportMode, setExportDpi, setExportMode } = useAppStore()
-  const currentDoc = documents[currentDocIndex] ?? null
+  const { documents, exportDpi, exportMode, exportFormat: format, setExportDpi, setExportMode, setExportFormat } = useAppStore()
   const hasPdf = documents.some((d) => d.source.type === 'pdf')
-  const [format, setFormat] = useState<ExportFormat>('pdf')
-  const [exporting, setExporting] = useState(false)
-
   const hasResult = documents.some((d) => d.pages.some((p) => p?.processedCanvas))
   const multiDoc = documents.length > 1
-  const allPages = documents.flatMap((d) => d.pages)
-  const multiPage = allPages.filter((p) => p?.processedCanvas).length > 1
-
-  const handleExport = async () => {
-    if (!hasResult || exporting) return
-    setExporting(true)
-    const mode = multiDoc ? exportMode : 'single'
-    trackEvent('export', 'export_file', `format:${format},mode:${mode},docs:${documents.length}`)
-    try {
-      if (multiDoc && format === 'pdf' && exportMode === 'merged') {
-        await exportAsPdf(allPages, 'dark-score-batch.pdf')
-      } else if (currentDoc) {
-        const readyPages = currentDoc.pages.filter((p) => p?.processedCanvas)
-        if (readyPages.length === 0) return
-        if (format === 'pdf') {
-          await exportAsPdf(readyPages, `${currentDoc.label}.pdf`)
-        } else {
-          await exportAsPng(readyPages, currentDoc.label)
-        }
-      }
-    } finally {
-      setExporting(false)
-    }
-  }
+  const multiPage = documents.flatMap((d) => d.pages).filter((p) => p?.processedCanvas).length > 1
 
   return (
     <div className="flex flex-col gap-2">
@@ -50,7 +25,7 @@ export function ExportButton() {
         {(['pdf', 'png'] as ExportFormat[]).map((f) => (
           <button
             key={f}
-            onClick={() => setFormat(f)}
+            onClick={() => setExportFormat(f)}
             disabled={!hasResult}
             className={`flex-1 py-1.5 font-medium uppercase tracking-wide transition-colors cursor-pointer disabled:cursor-not-allowed
               ${format === f ? 'bg-zinc-700 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
@@ -97,18 +72,74 @@ export function ExportButton() {
           </div>
         </div>
       )}
+    </div>
+  )
+}
 
-      <button
-        onClick={() => { void handleExport() }}
-        disabled={!hasResult || exporting}
-        className={`w-full font-semibold py-3 rounded-lg text-sm transition-colors
-          ${hasResult && !exporting
-            ? 'bg-purple-600 hover:bg-purple-500 text-white cursor-pointer'
-            : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
-          }`}
-      >
-        {exporting ? t('export.exporting') : t('export.button')}
-      </button>
+/**
+ * The export action. `labelled` names what will be downloaded ("Download
+ * PDF", "Download ZIP"), for layouts where the button sits away from the
+ * format selector.
+ */
+export function DownloadButton({ labelled = false }: Readonly<{ labelled?: boolean }>) {
+  const { t } = useTranslation()
+  const { documents, currentDocIndex, exportMode, exportFormat: format } = useAppStore()
+  const currentDoc = documents[currentDocIndex] ?? null
+  const [exporting, setExporting] = useState(false)
+
+  const hasResult = documents.some((d) => d.pages.some((p) => p?.processedCanvas))
+  const multiDoc = documents.length > 1
+  const allPages = documents.flatMap((d) => d.pages)
+  const currentReady = currentDoc?.pages.filter((p) => p?.processedCanvas).length ?? 0
+
+  const handleExport = async () => {
+    if (!hasResult || exporting) return
+    setExporting(true)
+    const mode = multiDoc ? exportMode : 'single'
+    trackEvent('export', 'export_file', `format:${format},mode:${mode},docs:${documents.length}`)
+    try {
+      if (multiDoc && format === 'pdf' && exportMode === 'merged') {
+        await exportAsPdf(allPages, 'dark-score-batch.pdf')
+      } else if (currentDoc) {
+        const readyPages = currentDoc.pages.filter((p) => p?.processedCanvas)
+        if (readyPages.length === 0) return
+        if (format === 'pdf') {
+          await exportAsPdf(readyPages, `${currentDoc.label}.pdf`)
+        } else {
+          await exportAsPng(readyPages, currentDoc.label)
+        }
+      }
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  let kind = 'PDF'
+  if (format === 'png') kind = currentReady > 1 ? 'ZIP' : 'PNG'
+  const label = labelled ? t('export.downloadAs', { kind }) : t('export.button')
+
+  return (
+    <button
+      onClick={() => { void handleExport() }}
+      disabled={!hasResult || exporting}
+      className={`w-full font-semibold py-3 rounded-lg text-sm transition-colors flex items-center justify-center gap-2
+        ${hasResult && !exporting
+          ? 'bg-purple-600 hover:bg-purple-500 text-white cursor-pointer'
+          : 'bg-zinc-800 text-zinc-600 cursor-not-allowed'
+        }`}
+    >
+      {labelled && !exporting && <Icon name="download" size={16} />}
+      {exporting ? t('export.exporting') : label}
+    </button>
+  )
+}
+
+/** Settings and action together ('actual' layout). */
+export function ExportButton() {
+  return (
+    <div className="flex flex-col gap-2">
+      <ExportSettings />
+      <DownloadButton />
     </div>
   )
 }
