@@ -192,6 +192,33 @@ test.describe('Zoom and compare', () => {
     await expect.poll(async () => Number((await zoomLabel(page).textContent())!.replace('%', ''))).toBeGreaterThan(fitted)
   })
 
+  test('RESP-08 resizing the window below the tablet breakpoint and back keeps the layout', async ({ page }) => {
+    await openEditorWith(page, FIXTURES.pdf2)
+    // the resize handle is hidden below 1024 px, the panel is its parent
+    const panel = page.getByRole('button', { name: 'Resize panel', includeHidden: true }).locator('xpath=..')
+    const sheet = previewCanvas(page)
+    const layoutAt = async (width: number) => {
+      await page.setViewportSize({ width, height: 800 })
+      await page.waitForTimeout(300)
+      return { panel: (await panel.boundingBox())!, sheet: (await sheet.boundingBox())! }
+    }
+
+    const wide = await layoutAt(1280)
+    expect(wide.panel.width).toBeLessThan(500)
+    expect(wide.sheet.width).toBeGreaterThan(500)
+
+    // stacked: the panel goes under the viewer and takes the full width
+    const narrow = await layoutAt(800)
+    expect(narrow.panel.width).toBeGreaterThan(780)
+    expect(narrow.panel.y).toBeGreaterThan(narrow.sheet.y)
+
+    // and back: side by side again, the page fitted to the wider viewer
+    const restored = await layoutAt(1280)
+    expect(restored.panel.width).toBeCloseTo(wide.panel.width, 0)
+    expect(restored.sheet.width).toBeGreaterThan(500)
+    await expect(page.getByRole('button', { name: 'Fit to width' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
   test('VIEW-05 Compare shows original and result with a draggable divider', async ({ page }) => {
     await openEditorWith(page, FIXTURES.png)
     await page.getByRole('button', { name: 'Compare' }).click()

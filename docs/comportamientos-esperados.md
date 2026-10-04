@@ -155,6 +155,7 @@ Los tests corren contra el build de producción (`vite preview`) en el Chrome in
 | RESP-05 | En iPad apaisado el panel de ajustes se puede redimensionar con el dedo. | auto (touch emulado) | ✅ |
 | RESP-06 | Los sliders confirman el cambio al levantar el dedo (entra en el historial). | auto (touch emulado) | ✅ |
 | RESP-07 | Todo lo anterior en un iPad real con Safari. | manual | — |
+| RESP-08 | Redimensionar la ventana por debajo del punto de corte de tablet (1024 px) y volver mantiene la distribución: por debajo, el panel va bajo el visor a todo el ancho; por encima, vuelven lado a lado con el ancho que tenía el panel y la página reajustada. | auto | ✅ |
 
 ## Errores (ERR)
 

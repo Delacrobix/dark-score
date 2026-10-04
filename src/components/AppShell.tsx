@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react'
+import { useState, useRef, useCallback, useEffect, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'wouter'
 import { useAppStore, type ClearedSnapshot } from '../store/useAppStore'
@@ -418,10 +418,12 @@ function ResizablePanel({ children, className, initialWidth = MIN_PANEL_WIDTH }:
   }, [width])
 
   return (
+    // The width only applies side by side (lg); the breakpoint is left to CSS,
+    // so resizing the window across it always lands on the right layout.
     <div
       ref={panelRef}
-      className={className}
-      style={{ width: globalThis.window !== undefined && globalThis.innerWidth >= 1024 ? width : undefined }}
+      className={`${className} lg:w-[var(--panel-w)] lg:max-w-[40vw]`}
+      style={{ '--panel-w': `${width}px` } as CSSProperties}
     >
       <button
         type="button"
