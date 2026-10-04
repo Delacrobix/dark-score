@@ -27,30 +27,41 @@ export function PresetSwatch({ bg, fg, className, wide = false }: Readonly<{ bg:
   )
 }
 
-/** Wide version: one staff running across, for the top of a preset card. */
-function PresetStrip({ bg, fg, className }: Readonly<{ bg: string; fg: string; className?: string }>) {
-  const notes = [
-    { x: 26, y: 21.5 },
-    { x: 44, y: 18 },
-    { x: 62, y: 14.5 },
-    { x: 80, y: 18 },
-    { x: 98, y: 11 },
-  ]
+/** Note pitches as staff steps (0 = bottom line, 8 = top line), repeated along the strip. */
+const STRIP_PITCHES = [2, 4, 6, 3, 7, 5, 1, 4, 8, 6, 3, 5]
+const STRIP_WIDTH = 600
+const STRIP_NOTES = Array.from({ length: 27 }, (_, i) => {
+  const step = STRIP_PITCHES[i % STRIP_PITCHES.length]
+  return { x: 14 + i * 22, y: 22 - step * 1.75 }
+})
+
+/**
+ * Wide version for the top of a preset card. The drawing is far wider than
+ * any card and is cropped, never scaled out of shape ('slice' keeps the
+ * proportions): a wide card simply shows more of the staff.
+ */
+function PresetStrip({ bg, fg, className = '' }: Readonly<{ bg: string; fg: string; className?: string }>) {
   return (
-    <svg viewBox="0 0 120 30" preserveAspectRatio="none" className={className} aria-hidden="true" focusable="false">
-      <rect x="0.5" y="0.5" width="119" height="29" rx="4" fill={bg} stroke="rgb(255 255 255 / 0.16)" vectorEffect="non-scaling-stroke" />
+    <svg
+      viewBox={`0 0 ${STRIP_WIDTH} 30`}
+      preserveAspectRatio="xMidYMid slice"
+      className={`rounded-[5px] ring-1 ring-white/15 ${className}`}
+      style={{ backgroundColor: bg }}
+      aria-hidden="true"
+      focusable="false"
+    >
       <g stroke={fg} strokeWidth="0.7" opacity="0.8">
         {[8, 11.5, 15, 18.5, 22].map((y) => (
-          <line key={y} x1="8" x2="112" y1={y} y2={y} />
+          <line key={y} x1="0" x2={STRIP_WIDTH} y1={y} y2={y} />
         ))}
       </g>
       <g fill={fg}>
-        {notes.map((n) => (
+        {STRIP_NOTES.map((n) => (
           <ellipse key={n.x} cx={n.x} cy={n.y} rx="2.6" ry="1.85" transform={`rotate(-22 ${n.x} ${n.y})`} />
         ))}
       </g>
       <g stroke={fg} strokeWidth="0.8" strokeLinecap="round">
-        {notes.map((n) => (
+        {STRIP_NOTES.map((n) => (
           n.y > 15
             ? <line key={n.x} x1={n.x + 2.3} y1={n.y - 0.6} x2={n.x + 2.3} y2={n.y - 10} />
             : <line key={n.x} x1={n.x - 2.3} y1={n.y + 0.6} x2={n.x - 2.3} y2={n.y + 10} />
