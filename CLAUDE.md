@@ -38,6 +38,12 @@ scripts/prerender.mjs # genera el HTML estático tras el build
 
 - `AppShell` y `AboutPage` se cargan con `React.lazy`; `pdfjs-dist`, `jspdf` y `jszip` se importan dinámicamente solo cuando se usan. No añadir imports estáticos de estas librerías fuera de `src/lib/`.
 
+## Variantes de diseño
+
+- `src/design/options.ts` lista las opciones de diseño conmutables (ids, variantes, y `chosen`, la que usa producción). `'actual'` es siempre el diseño anterior a 2026-10-04 y se conserva a propósito: no borrar variantes no elegidas.
+- Los componentes leen la variante con `useDesignOption(id)` (o `getDesignOption` fuera de React); los iconos con `<Glyph>`, el contraste por `data-contrast` en `<html>` (`src/index.css`).
+- En `npm run dev` hay un panel flotante "Opciones de diseño" (`src/design/DesignOptionsPanel.tsx`, textos en `optionDocs.ts`) para cambiarlas en vivo; no entra en el build. Cambiar lo que ve producción = cambiar `chosen` y revisar las filas 🎨 de `docs/comportamientos-esperados.md`.
+
 ## Tests
 
 - `npm test` — vitest (unitarios + smoke de rutas en jsdom).

@@ -10,6 +10,12 @@ import { ROUTES } from './lib/routes'
 // static imports: they are small and must render on the server (prerender).
 const AppShell = lazy(() => import('./components/AppShell').then((m) => ({ default: m.AppShell })))
 
+// Design variants switcher, development only (tree-shaken from builds).
+const DesignOptionsPanel =
+  import.meta.env.DEV && import.meta.env.MODE !== 'test'
+    ? lazy(() => import('./design/DesignOptionsPanel'))
+    : null
+
 /** Unknown path → home of the current language, without a trailing slash. */
 function HomeRedirect() {
   const { base } = useRouter()
@@ -44,6 +50,11 @@ export default function App() {
           </Route>
         </Switch>
       </Suspense>
+      {DesignOptionsPanel && (
+        <Suspense fallback={null}>
+          <DesignOptionsPanel />
+        </Suspense>
+      )}
     </ErrorBoundary>
   )
 }
